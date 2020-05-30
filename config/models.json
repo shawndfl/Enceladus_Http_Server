@@ -1,0 +1,23 @@
+{
+	"name": "modle1",
+	"materials": [
+		{
+			"name" : "default",
+			"transparent": "true",
+			"diffused": "0,0,0",
+			"glow": "0,0,0",
+			"_": "This texture must be a 16 X 16 map of images",
+			"diffusedTex" : "environment.png"
+		}		
+	],
+	"meshes": [
+		{
+			"name" : "Head",
+			"min": "-1,-1,-1",
+			"max": "1,1,1",
+			"mat": "default",
+			"_" : "This is the texture index for the face of the mesh",
+			"texture": "1,2,3,4,5,6"
+		}
+	]
+}
