@@ -8,6 +8,8 @@
 #include <atomic>
 #include <functional>
 #include <thread>
+#include <mutex>
+#include <vector>
 #include "HttpClientContext.h"
 #include "HttpServerContext.h"
 #include "HttpRequest.h"
@@ -68,12 +70,25 @@ public:
    /**
     * Gets the request handler
     */
-   RequestHandler getRequestHandler() const;
+   HttpRequestHandler getRequestHandler() const;
+
+   void shutdown();
 
 private:
 
-   std::thread       acceptThread_;
-   RequestHandler    requestHandler_;
+   void acceptHandler();
+
+   void requestHandler();
+
+private:
+
+   std::thread                acceptThread_;
+   HttpRequestHandler         requestHandler_;
+   HttpServerContext          serverContext_;
+
+   bool                       shutdown_;
+   std::mutex                 mutex_;
+   std::vector<std::thread>   requestThreads_;
 
 };
 

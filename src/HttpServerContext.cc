@@ -2,9 +2,9 @@
 #include "HttpServerContext.h"
 
 /*************************************************/
-HttpServerContext::HttpServerContext(int port, int socketfd, HttpServer &server):
-   port_(port),
-   socketfd_(socketfd),
+HttpServerContext::HttpServerContext(HttpServer &server):
+   port_(0),
+   socketfd_(-1),
    server_(server)  {
 
 }
@@ -22,5 +22,15 @@ const HttpServer&& HttpServerContext::getServer() const {
 /*************************************************/
 int HttpServerContext::getSocketfd() const {
    return socketfd_;
+}
+
+/*************************************************/
+void HttpServerContext::setPort(int port) {
+   port_ = port;
+}
+
+/*************************************************/
+void HttpServerContext::setSocketfd(int socketfd) {
+   socketfd_ = socketfd;
 }
 /*************************************************/

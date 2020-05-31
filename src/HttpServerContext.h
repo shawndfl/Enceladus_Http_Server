@@ -10,13 +10,17 @@ class HttpServer;
 class HttpServerContext {
 public:
 
-   HttpServerContext(int port, int serverfd, HttpServer& server);
+   HttpServerContext(HttpServer& server);
 
    int getPort() const;
 
    const HttpServer&& getServer() const;
 
    int getSocketfd() const;
+
+   void setPort(int port);
+
+   void setSocketfd(int socketfd);
 
 private:
 

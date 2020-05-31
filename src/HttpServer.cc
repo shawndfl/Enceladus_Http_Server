@@ -16,14 +16,14 @@
 
 #define BACKLOG 50
 
-void* acceptEvent(void * context);
 void* readEvent(void * context);
 size_t readn(int fd, HttpRequest& request);
 size_t writen(int fd, const void* buffer, size_t size);
 
 /*************************************************/
-HttpServer::HttpServer() {
-
+HttpServer::HttpServer() :
+      serverContext_(*this) {
+   shutdown_ = false;
 }
 
 /*************************************************/
@@ -38,268 +38,114 @@ bool HttpServer::StartServer(int port) {
       return false;
    }
 
-
    // Creating socket file descriptor
    int fd;
    if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
       LOGE("socket error: %d", errno);
       return false;
    }
-   HttpServerContext context(port, fd, *this);
+   serverContext_.setPort(port);
+   serverContext_.setSocketfd(fd);
 
    // Forcefully attaching socket to the port 8080
    int opt = 1;
-   if (setsockopt(context.getSocketfd(), SOL_SOCKET,
+   if (setsockopt(serverContext_.getSocketfd(), SOL_SOCKET,
    SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
       LOGE("setsockopt error: %d", errno);
       return false;
    }
 
-   if (setsockopt(context.getSocketfd(), SOL_SOCKET,
+   if (setsockopt(serverContext_.getSocketfd(), SOL_SOCKET,
    SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
       LOGE("setsockopt error: %d", errno);
       return false;
    }
 
    struct sockaddr_in address;
-   //memset(&address, 0, sizeof(sockaddr_in));
+   memset(&address, 0, sizeof(sockaddr_in));
    address.sin_family = AF_INET;
    address.sin_addr.s_addr = INADDR_ANY;
-   address.sin_port = htons(context.getPort());
+   address.sin_port = htons(serverContext_.getPort());
 
    // socket to the port
-   if (bind(context.getSocketfd(), (struct sockaddr *) &address, sizeof(address)) < 0) {
-      LOGE("Error binding to port %d", context.getPort());
+   if (bind(serverContext_.getSocketfd(), (struct sockaddr *) &address, sizeof(address)) < 0) {
+      LOGE("Error binding to port %d", serverContext_.getPort());
       return false;
    }
 
-   if (listen(context.getSocketfd(), BACKLOG) < 0) {
-      LOGE("Error listen %d %d",context.getSocketfd(), errno);
+   if (listen(serverContext_.getSocketfd(), BACKLOG) < 0) {
+      LOGE("Error listen %d %d",serverContext_.getSocketfd(), errno);
       return false;
    }
 
-   LOGI("Listening on port %d", context.getPort());
+   LOGI("Listening on port %d", serverContext_.getPort());
 
-   pthread_attr_t attr;
-   pthread_attr_init(&attr);
-   pthread_create(&_acceptThread, &attr, &acceptEvent, &serverContext_);
-   pthread_attr_destroy(&attr);
+   std::thread accept(&HttpServer::acceptHandler, this);
+   acceptThread_  = std::move(accept);
 
    return true;
 }
 
 /*************************************************/
+void HttpServer::shutdown() {
+   std::lock_guard<std::mutex> lock(mutex_);
+   shutdown_ = true;
+}
+
+/*************************************************/
 void HttpServer::JoinAcceptThread() {
-   int ret;
-   int* retp = &ret;
 
-   pthread_join(_acceptThread, (void**) &retp);
-
-   LOGI("Join main thread %d", ret);
-}
-
-/*************************************************/
-RequestHandler HttpServer::getRequestHandler() const {
-   return _requestHandler;
-}
-
-/*************************************************/
-void HttpServer::setRequestHandler(RequestHandler handler) {
-   _requestHandler = handler;
-}
-
-/*************************************************/
-void* HttpServer::getUserData() const {
-   return _userData;
-}
-
-/*************************************************/
-void HttpServer::setUserData(void* userData) {
-   _userData = userData;
-}
-
-/*************************************************/
-// Client Context
-/*************************************************/
-void ClientContext::SendResponse() {
-
-   std::string out;
-   out = response.httpVersion + " " + response.getStatusCodeAndReason() + "\r\n";
-
-   // Fill in the size of the content
-   char buf[200] = { 0 };
-   size_t size = response.body.size();
-   sprintf(buf, "%zd", size);
-   response.appendHeader("Content-Length", buf);
-
-   // Write the headers
-   for (size_t i = 0; i < response.headers.size(); i++) {
-      KeyValue pair = response.headers.at(i);
-      out += pair.key + ": " + pair.value + "\r\n";
+   if(acceptThread_.joinable()){
+      acceptThread_.join();
    }
 
-   // Done with headers
-   out += "\r\n";
-
-   // Write the body
-   out += response.body;
-
-   size_t bytesSent = writen(clientfd, out.c_str(), out.size());
-   if (bytesSent < 0) {
-      //EROFS
-      LOGE("Error sending %d ", errno);
-   }
-
-   // TODO don't close this here. check to keep alive
-   close(clientfd);
-
+   LOGI("Join main thread ");
 }
 
 /*************************************************/
-// Response
-/*************************************************/
-bool Response::PrepareHeaders() {
-
-   return false;
+HttpRequestHandler HttpServer::getRequestHandler() const {
+   return requestHandler_;
 }
 
 /*************************************************/
-void Response::appendHeader(const std::string& key, const std::string& value) {
-   KeyValue pair;
-   pair.key = key;
-   pair.value = value;
-   headers.push_back(pair);
+void HttpServer::setRequestHandler(HttpRequestHandler handler) {
+   requestHandler_ = handler;
 }
 
 /*************************************************/
-std::string Response::getStatusCodeAndReason() const {
+void HttpServer::acceptHandler() {
 
-   switch (statusCode) {
-   case CODE100:
-      return "100 Continue";
-   case CODE101:
-      return "101 Switching Protocols";
-   case CODE200:
-      return "200 OK";
-   case CODE201:
-      return "201 Created";
-   case CODE202:
-      return "202 Accepted";
-   case CODE203:
-      return "203 Non-Authoritative Information";
-   case CODE204:
-      return "204 No Content";
-   case CODE205:
-      return "205 Reset Content";
-   case CODE206:
-      return "206 Partial Content";
-   case CODE300:
-      return "300 Multiple Choices";
-   case CODE301:
-      return "301 Moved Permanently";
-   case CODE302:
-      return "302 Found";
-   case CODE303:
-      return "303 See Other";
-   case CODE304:
-      return "304 Not Modified";
-   case CODE305:
-      return "305 Use Proxy";
-   case CODE307:
-      return "307 Temporary Redirect";
-   case CODE400:
-      return "400 Bad Request";
-   case CODE401:
-      return "401 Unauthorized";
-   case CODE402:
-      return "402 Payment Required";
-   case CODE403:
-      return "403 Forbidden";
-   case CODE404:
-      return "404 Not Found";
-   case CODE405:
-      return "405 Method Not Allowed";
-   case CODE406:
-      return "406 Not Acceptable";
-   case CODE407:
-      return "407 Proxy Authentication Required";
-   case CODE408:
-      return "408 Request Timeout";
-   case CODE409:
-      return "409 Conflict";
-   case CODE410:
-      return "410 Gone";
-   case CODE411:
-      return "411 Length Required";
-   case CODE412:
-      return "412 Precondition Failed";
-   case CODE413:
-      return "413 Payload Too Large";
-   case CODE414:
-      return "414 URI Too Long";
-   case CODE415:
-      return "415 Unsupported Media Type";
-   case CODE416:
-      return "416 Range Not Satisfiable";
-   case CODE417:
-      return "417 Expectation Failed";
-   case CODE426:
-      return "426 Upgrade Required";
-   case CODE500:
-      return "500 Internal Server Error";
-   case CODE501:
-      return "501 Not Implemented";
-   case CODE502:
-      return "502 Bad Gateway";
-   case CODE503:
-      return "503 Service Unavailable";
-   case CODE504:
-      return "504 Gateway Timeout";
-   case CODE505:
-      return "505 HTTP Version Not Supported";
-   default:
-      LOGE("Unknown return code: %d ", statusCode);
-      return "500 Internal Server Error";
-   }
-}
-
-/*************************************************/
-// Request
-
-
-/*************************************************/
-// Helper functions
-/*************************************************/
-void* acceptEvent(void * context) {
-
-   ServerContext* serverContext = (ServerContext*) context;
 
    while (true) {
 
       struct sockaddr clientAddr;
       socklen_t addrLen = sizeof(clientAddr);
-      int clientfd = accept(serverContext->serverfd, &clientAddr, &addrLen);
+      int clientfd = accept(serverContext_.getSocketfd(), &clientAddr, &addrLen);
       if (clientfd < 0) {
          LOGE("Error accept %d %d", clientfd, errno);
-         exit(EXIT_FAILURE);
+         break;
+      }
+
+      {
+         // see if we should exit this loop
+         std::lock_guard<std::mutex> lock(mutex_);
+         if (shutdown_) {
+            break;
+         }
       }
 
       //TODO add ip address of client
       LOGI("Got a client %d", clientfd);
 
-      ClientContext* receiveContext = new ClientContext(serverContext->server, clientfd);
-
-      pthread_attr_t attr;
-      pthread_attr_init(&attr);
-      pthread_create(&receiveContext->thread, &attr, &readEvent, receiveContext);
-      pthread_attr_destroy(&attr);
+      HttpClientContext context(clientfd);
+      std::thread clientThread(&HttpServer::requestHandler, this, context);
+      requestThreads_.push_back(std::move(clientThread));
    }
 
-   return nullptr;
 }
 
 /*************************************************/
-size_t readn(int fd, Request& request) {
+size_t readn(int fd, HttpRequest& request) {
 
    size_t totalBytesRead = 0;
 
@@ -378,10 +224,9 @@ size_t writen(int fd, const void* buffer, size_t size) {
 }
 
 /*************************************************/
-void* readEvent(void * context) {
-   ClientContext* clientContext = (ClientContext*) context;
+void HttpServer::requestHandler(HttpClientContext context) {
 
-   LOGI("Got a client %d", clientContext->clientfd);
+   LOGI("Got a client");
 
    while (true) {
 

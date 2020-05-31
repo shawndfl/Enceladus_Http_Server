@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include "HttpConst.h"
 
 /**
  * This structure can handle a response.
@@ -13,7 +14,9 @@
  *    Headers
  *    Message Body
  */
-struct HttpResponse {
+class HttpResponse {
+public:
+
    enum StatusCode {
       CODE100,
       CODE101,
@@ -93,7 +96,7 @@ struct HttpResponse {
    /**
     * Headers
     */
-   std::vector<KeyValue> headers;
+   std::vector<Pair> headers;
 
    /**
     * appends a header line

@@ -3,8 +3,7 @@
 
 #include <string>
 #include <vector>
-
-typedef std::pair<std::string,std::string> KeyValue;
+#include "HttpConst.h"
 
 /**
  * The request from the client.
@@ -35,14 +34,14 @@ public:
    void ParseRequest(const char* buffer, size_t size);
 
    const std::string& getBody() const;
-   const std::vector<KeyValue>& getHeaders() const;
+   const std::vector<Pair>& getHeaders() const;
    const std::string& getHttpVersion() const;
    const std::string& getMethod() const;
    const std::string& getParsedLine() const;
    ParseState getParsedState() const;
    int getParseErrorCode() const;
    const std::string& getUri() const;
-   const std::vector<KeyValue>& getQueryParameters() const;
+   const std::vector<Pair>& getQueryParameters() const;
    const std::string& getUriPath() const;
    const std::string& getUriQuery() const;
 
@@ -151,12 +150,12 @@ private:
     * Parameters used by the request. This is pulled out
     * of the Uri query.
     */
-   std::vector<KeyValue> queryParameters;
+   std::vector<Pair> queryParameters;
 
    /**
     * Headers
     */
-   std::vector<KeyValue> headers;
+   std::vector<Pair> headers;
 
    /**
     * Body

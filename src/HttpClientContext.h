@@ -3,6 +3,7 @@
 
 #include "HttpRequest.h"
 #include "HttpResponse.h"
+#include "HttpConst.h"
 
 /**
  * The context of the client connect.
@@ -28,8 +29,14 @@ public:
     * Call this after Response is fill out
     */
    void SendResponse();
+
+   /**
+    * gets the client's socket
+    */
+   int getSocketfd() const;
+
 private:
-   int clientfd_;
+   int socketfd_;
 
 };
 
