@@ -9,11 +9,11 @@ OBJ := $(SRC:%=bin/%.o)
 
 PKGS := epoxy x11 UnitTest++
 
-CFLAGS := -Wall -O3 -pthread -std=c++17 -MMD
-LDLIBS := -lstdc++
+CFLAGS := -Wall -O3 -std=c++17 -MMD
+LDLIBS := -lstdc++ -pthread
 
 # Phony targets
-.PHONY: all clean debug
+.PHONY: all clean debug env
 
 #
 # Bulid app
@@ -42,6 +42,10 @@ $(APP): $(OBJ)
 	@echo linking $@
 	@$(CXX) -o $@ $(OBJ) $(LDFLAGS) $(LDLIBS)
 
+env:
+	@echo "SRC = $(SRC)"
+	@echo ""		
+	@echo "OBJ = $(OBJ)"
 #
 # Clean
 #

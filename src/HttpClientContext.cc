@@ -38,9 +38,7 @@ void HttpClientContext::SendResponse() {
       LOGE("Error sending %d ", errno);
    }
 
-   // TODO don't close this here. check to keep alive
-   close(clientfd);
-
+   close(socketfd_);
 }
 
 /*************************************************/

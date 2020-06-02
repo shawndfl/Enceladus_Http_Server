@@ -61,6 +61,8 @@ public:
       CODE505,
    };
 
+   HttpResponse();
+
    /**
     *  Status Line
     *  the http version

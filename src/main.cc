@@ -1,8 +1,10 @@
+#ifndef UNIT_TEST
+
 #include <iostream>
 #include "Logging.h"
 #include "HttpServer.h"
 
-void Handler(HttpClientContext& client, const HttpServerContext& server) {
+bool Handler(HttpClientContext& client, const HttpServerContext& server) {
 
    LOGI("uri: %s", client.request.getUri().c_str());
    LOGI("uriPath: %s", client.request.getUriPath().c_str());
@@ -13,7 +15,6 @@ void Handler(HttpClientContext& client, const HttpServerContext& server) {
    for (size_t i = 0; i < client.request.getQueryParameters().size(); i++) {
       Pair pair = client.request.getQueryParameters().at(i);
 
-      //LOGI("%d: \"%s\" == \"%s\"", i, pair.key.c_str(), pair.value.c_str());
       body += pair.first + " = " + pair.second + "<br>";
    }
 
@@ -26,14 +27,14 @@ void Handler(HttpClientContext& client, const HttpServerContext& server) {
    client.SendResponse();
 
    //LOGI("Is render initialized %i", render->isInitialized());
-
+   return true;
 }
 
 int main(int argc, char *argv[]) {
 
    HttpServer server;
    server.StartServer(8080);
-   server.setRequestHandler(&Handler);
+   server.addRequestHandler(&Handler);
 
    server.JoinAcceptThread();
 
@@ -41,3 +42,5 @@ int main(int argc, char *argv[]) {
 
    return 0;
 }
+
+#endif

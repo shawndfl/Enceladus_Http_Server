@@ -3,7 +3,6 @@
 #define SRC_BSKHTTPSERVER_H_
 
 #include <queue>
-#include <pthread.h>
 #include <string>
 #include <atomic>
 #include <functional>
@@ -50,12 +49,7 @@ public:
     * NOTE: The request handler is called on the client thread. Thread synchronization
     *       will be required when accessing shared resources.
     */
-   void setRequestHandler(HttpRequestHandler handler);
-
-   /**
-    * User data that is passed to the handler.
-    */
-   void setUserData(void* userData);
+   void addRequestHandler(HttpRequestHandler handler);
 
    /**
     * Gets the user data for the request handler.
@@ -67,10 +61,6 @@ public:
     */
    void JoinAcceptThread();
 
-   /**
-    * Gets the request handler
-    */
-   HttpRequestHandler getRequestHandler() const;
 
    void shutdown();
 
@@ -78,12 +68,14 @@ private:
 
    void acceptHandler();
 
-   void requestHandler();
+   void requestHandler(HttpClientContext context);
+
+   bool readRequest(int fd, std::string& request);
 
 private:
 
    std::thread                acceptThread_;
-   HttpRequestHandler         requestHandler_;
+   std::vector<HttpRequestHandler>         filters_;
    HttpServerContext          serverContext_;
 
    bool                       shutdown_;

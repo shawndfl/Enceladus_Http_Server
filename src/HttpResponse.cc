@@ -1,6 +1,6 @@
 
 #include "HttpResponse.h"
-
+#include "Logging.h"
 /*************************************************/
 HttpResponse::HttpResponse() {
    statusCode = CODE500;
@@ -14,9 +14,9 @@ bool HttpResponse::PrepareHeaders() {
 
 /*************************************************/
 void HttpResponse::appendHeader(const std::string& key, const std::string& value) {
-   KeyValue pair;
-   pair.key = key;
-   pair.value = value;
+   Pair pair;
+   pair.first = key;
+   pair.second = value;
    headers.push_back(pair);
 }
 

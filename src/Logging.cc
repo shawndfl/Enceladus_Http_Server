@@ -1,9 +1,13 @@
 
 #include "Logging.h"
 
+#include <chrono>
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
+#include <sstream>
+#include <iostream>
+#include <iomanip>
 
 /*************************************************/
 Logging::Logging() {
@@ -11,12 +15,6 @@ Logging::Logging() {
 
 /*************************************************/
 Logging::~Logging() {
-}
-
-/*************************************************/
-Logging* Logging::get() {
-   static Logging* instance = new Logging();
-   return instance;
 }
 
 /*************************************************/
@@ -30,8 +28,32 @@ void Logging::timestamp(char* outTimestamp, int len)
 
 
 /*************************************************/
-void Logging::logit(const char* logType, const char* file, int line,
-      const char* text) {
-   printf("%s %s(%d) %s\n", logType, file, line, text);
+void Logging::logit(const char logType,
+      const std::string& file,
+      int line,
+      const std::string& text) {
+
+   auto t = std::chrono::high_resolution_clock::now();
+   std::time_t time = std::chrono::system_clock::to_time_t(t);
+   std::tm* now = std::localtime(&time);
+
+   const int fileSize = 20;
+   std::string filename;
+   if(file.size() > fileSize - 3) {
+      filename = "..." + file.substr(file.size() - (fileSize -3) );
+   } else {
+      filename = file;
+   }
+
+   std::cout << logType
+         << " (" << now->tm_hour  << ":"
+         << now->tm_min  << ":"
+         << now->tm_sec
+         <<  ") "
+         << std::setw(fileSize)
+         << filename << ":"
+         << line << " "
+         << text
+         <<  std::endl;
 }
 

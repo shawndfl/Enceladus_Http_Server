@@ -109,7 +109,7 @@ bool HttpRequest::ParseRequestLine(const std::string& line) {
       } else if (state == VALUE && ch == '&') {
          state = KEY;
 
-         KeyValue pair;
+         Pair pair;
          pair.first = key;
          pair.second = value;
          queryParameters.push_back(pair);
@@ -122,7 +122,7 @@ bool HttpRequest::ParseRequestLine(const std::string& line) {
 
    // Save the last one
    if (key.size() > 0 && value.size() > 0) {
-      KeyValue pair;
+      Pair pair;
       pair.first = key;
       pair.second = value;
       queryParameters.push_back(pair);
@@ -134,7 +134,7 @@ bool HttpRequest::ParseRequestLine(const std::string& line) {
 /*************************************************/
 bool HttpRequest::ParseHeaderLine(const std::string& line) {
    size_t i = 0;
-   KeyValue pair;
+   Pair pair;
 
    // Find field name
    for (i = 0; i < line.size(); i++) {
@@ -264,7 +264,7 @@ void HttpRequest::ParseRequest(const char* buffer, size_t size) {
 }
 
 /*************************************************/
-const std::vector<KeyValue>& HttpRequest::getQueryParameters() const {
+const std::vector<Pair>& HttpRequest::getQueryParameters() const {
    return queryParameters;
 }
 
@@ -284,7 +284,7 @@ const std::string& HttpRequest::getBody() const {
 }
 
 /*************************************************/
-const std::vector<KeyValue>& HttpRequest::getHeaders() const {
+const std::vector<Pair>& HttpRequest::getHeaders() const {
    return headers;
 }
 

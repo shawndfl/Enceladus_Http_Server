@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
-#include <pthread.h>
 #include <signal.h>
 #include <errno.h>
 
@@ -34,7 +33,7 @@ HttpServer::~HttpServer() {
 bool HttpServer::StartServer(int port) {
 
    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
-      LOGE("Cannot filter SIGPIPE");
+      LOGE( "Cannot filter SIGPIPE");
       return false;
    }
 
@@ -103,13 +102,8 @@ void HttpServer::JoinAcceptThread() {
 }
 
 /*************************************************/
-HttpRequestHandler HttpServer::getRequestHandler() const {
-   return requestHandler_;
-}
-
-/*************************************************/
-void HttpServer::setRequestHandler(HttpRequestHandler handler) {
-   requestHandler_ = handler;
+void HttpServer::addRequestHandler(HttpRequestHandler handler) {
+   filters_.push_back(handler);
 }
 
 /*************************************************/
@@ -145,6 +139,7 @@ void HttpServer::acceptHandler() {
 }
 
 /*************************************************/
+#if 0
 size_t readn(int fd, HttpRequest& request) {
 
    size_t totalBytesRead = 0;
@@ -197,6 +192,7 @@ size_t readn(int fd, HttpRequest& request) {
    }
    return totalBytesRead;
 }
+#endif
 
 /*************************************************/
 size_t writen(int fd, const void* buffer, size_t size) {
@@ -223,6 +219,11 @@ size_t writen(int fd, const void* buffer, size_t size) {
    return totalBytesWrote;
 }
 
+bool HttpServer::readRequest(int fd, std::string& request) {
+
+   return true;
+}
+
 /*************************************************/
 void HttpServer::requestHandler(HttpClientContext context) {
 
@@ -231,35 +232,34 @@ void HttpServer::requestHandler(HttpClientContext context) {
    while (true) {
 
       // Read the request
-      int bytesRead = readn(clientContext->clientfd, clientContext->request);
-      if (bytesRead == -1) {
-         LOGE("Error reading request from %d", clientContext->clientfd);
+      std::string request;
+      if (!readRequest(context.getSocketfd(), request)) {
+         LOGE("Error reading request from %d: %s", context.getSocketfd(), request.c_str());
          break;
       }
 
-      // TODO move this to a initialize response function
       // Set the http version
-      clientContext->response.httpVersion = HTTP_VERSION;
+      context.response.httpVersion = HTTP_VERSION;
 
-      // Fillin the date header
+      // Fill in the date header
       char buf[200];
       time_t now = time(0);
       struct tm tm = *gmtime(&now);
+
       // Sun, 06 Nov 1994 08:49:37 GMT
       strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %Z", &tm);
-      clientContext->response.appendHeader("Date", std::string(buf));
+      context.response.appendHeader("Date", std::string(buf));
 
       // Fill in the server Header
-      clientContext->response.appendHeader("Server", "Embedded");
+      context.response.appendHeader("Server", "Embedded");
 
       // Let the user handle the request
-      if (clientContext->server->getRequestHandler() != nullptr) {
-         clientContext->server->getRequestHandler()(clientContext, clientContext->server->getUserData());
-      } else {
-         LOGW("No request handler. Call HttpServer::setRequestHandler()");
-      }
+     for(auto filter: filters_) {
+        if(filter(context, serverContext_)) {
+           break;
+        }
+     }
 
       break;
    }
-   return nullptr;
 }

@@ -17,7 +17,7 @@ typedef std::pair<std::string,std::string> Pair;
 /**
  * Request handler callback
  */
-typedef std::function<void(HttpClientContext&, const HttpServerContext&)> HttpRequestHandler;
+typedef std::function<bool(HttpClientContext&, const HttpServerContext&)> HttpRequestHandler;
 
 
 
