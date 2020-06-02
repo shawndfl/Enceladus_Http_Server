@@ -60,9 +60,9 @@ public:
    void set(int index, const JsonNode& value);
 
    /**
-    * Adds to the end of an array
+    * Creates an element at the end of an array
     */
-   void append(const JsonNode& value);
+   JsonNode& append();
 
    /**
     * Clears both arrays and objects
@@ -74,9 +74,29 @@ public:
     */
    std::string toString() const;
 
+   JsonNode& operator[](int index);
+
+   JsonNode& operator[](const std::string& key);
+
+   JsonNode& operator=(int value);
+
+   JsonNode& operator=(uint value);
+
+   JsonNode& operator=(ulong value);
+
+   JsonNode& operator=(bool value);
+
+   JsonNode& operator=(long value);
+
+   JsonNode& operator=(double value);
+
+   JsonNode& operator=(const std::string& value);
+
+
+
 private:
    void toStringImpl(std::string& string) const;
-
+   //JsonNode(const JsonNode& node){}
 private:
 
    Type                             type_;

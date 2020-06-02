@@ -12,4 +12,16 @@ SUITE(Json){
 
    }
 
+   TEST(Array) {
+        JsonNode node;
+        node.append() = 12;
+        node.append() = 13;
+        //JsonNode& value1 = node.append();
+        //JsonNode& value2 = node.append();
+        //value1 = 12;
+        //value2 = 13;
+        LOG("Json: " << node.toString());
+
+     }
+
 }
