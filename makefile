@@ -1,13 +1,9 @@
 
-APP:=BlockSimulatedKingdom
+APP:=bin/BlockSimulatedKingdom
 
 SRC_CC := $(wildcard ./src/*.cc)
 SRC := $(notdir $(SRC_CC:%.cc=%))
-OBJ := $(SRC:%=bin/%.o)
-
-#sudo apt install libx11-dev libepoxy-dev libunittest++-dev
-
-PKGS := epoxy x11 UnitTest++
+OBJ := $(filter-out main.o,$(SRC:%=bin/%.o))
 
 CFLAGS := -Wall -O3 -std=c++17 -MMD
 LDLIBS := -lstdc++ -pthread
