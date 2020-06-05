@@ -31,7 +31,7 @@ private:
 
 #define LOG( STREAM ) do {                               \
       std::stringstream LoggingString;                   \
-      LoggingString << STREAM << std::endl;              \
+      LoggingString << STREAM;              \
       Logging::logit('d', __FILE__, __LINE__, LoggingString.str() );  \
 } while(0)
 

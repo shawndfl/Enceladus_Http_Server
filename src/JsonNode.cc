@@ -48,6 +48,9 @@ void JsonNode::set(const std::string& key, const JsonNode& value) {
 void JsonNode::clear() {
    valueArray_.clear();
    valueObj_.clear();
+   type_ = JsonNull;
+   valueNum_ = 0;
+   valueStr_ = "";
 }
 
 /*************************************************/
