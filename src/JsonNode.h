@@ -39,11 +39,8 @@ public:
    /**
     * Sets true
     */
-   void setTrue();
-   /**
-    * Sets false
-    */
-   void setFalse();
+   void setBool(bool value);
+
    /**
     * Sets null
     */
@@ -72,7 +69,7 @@ public:
    /**
     * Gets the string value of this node
     */
-   std::string toString() const;
+   std::string toString(bool humanReadable = false) const;
 
    JsonNode& operator[](int index);
 
@@ -84,19 +81,19 @@ public:
 
    JsonNode& operator=(ulong value);
 
-   JsonNode& operator=(bool value);
-
    JsonNode& operator=(long value);
 
    JsonNode& operator=(double value);
 
+   JsonNode& operator=(const char* value);
+
    JsonNode& operator=(const std::string& value);
 
-
-
 private:
-   void toStringImpl(std::string& string) const;
-   //JsonNode(const JsonNode& node){}
+
+   void toStringImpl(std::string& json) const;
+
+   void toStringReadableImpl(std::string& json, int tab) const;
 private:
 
    Type                             type_;
