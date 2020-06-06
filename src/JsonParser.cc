@@ -40,16 +40,6 @@ const JsonNode& JsonParser::parse(const std::string& json) {
    token_ = "";
    node_.clear();
 
-   while (true) {
-      std::string token = getToken();
-      if(token.size() == 0) {
-         break;
-      }
-      LOG("Line: " << line_ << " Token: \'" << token << "\'");
-   }
-
-   return node_;
-#if 0
    std::string token = getToken();
    if(token == "{") {
       processObject(node_);
@@ -60,7 +50,6 @@ const JsonNode& JsonParser::parse(const std::string& json) {
    }
 
    return node_;
-#endif
 }
 
 /*************************************************/
@@ -78,14 +67,35 @@ const JsonNode& JsonParser::parseFile(const std::string& file) {
 /*************************************************/
 bool JsonParser::eatWhiteSpace() {
    bool hasWhiteSpace = false;
-   while(json_[index_] == ' '  || json_[index_] == '\t' ||
-         json_[index_] == '\n' || json_[index_] == '\r' ) {
+   bool inComment = false;
 
-      index_++;
+   while(true) {
+
+      // handle comment
+      if (json_[index_] == '#') {
+         inComment = true;
+      }
+
+      if(inComment) {
+         if(json_[index_] == '\n' || json_[index_] == '\r' ) {
+            inComment = false;
+         }
+      } else {
+         // if not white space break
+         if(json_[index_] != ' '  && json_[index_] != '\t' &&
+            json_[index_] != '\n' && json_[index_] != '\r' ) {
+            break;
+         }
+      }
 
       if(json_[index_] == '\n' || json_[index_] == '\r' ) {
          line_++;
       }
+
+      index_++;
+
+
+      // set the flag that some white space was found
       hasWhiteSpace = true;
    }
 
@@ -94,10 +104,8 @@ bool JsonParser::eatWhiteSpace() {
 
 /*************************************************/
 char JsonParser::peek() const {
-   LOG("i=" << index_ << " size: " << json_.size());
-
-   if(index_ + 1 < json_.size()) {
-      return json_[index_ + 1];
+   if(index_ < json_.size()) {
+      return json_[index_];
    } else {
       return '\0';
    }
@@ -111,6 +119,9 @@ std::string JsonParser::getToken() {
 
    if(ch =='\"') {
 
+      // keep the quotes
+      token_ += ch;
+
       // collect the token until a " is found
       for (index_++; index_ < json_.size(); index_++) {
          ch = json_[index_];
@@ -120,13 +131,14 @@ std::string JsonParser::getToken() {
             line_++;
          }
 
+         // collect the string including the last quote
+         token_ += ch;
+
          // done
          if (ch == '\"') {
             index_++;   // eat the quote
             break;
          }
-
-         token_ += ch;
       }
    } else if (isDelimiter(ch)) {
       // single token
@@ -152,22 +164,105 @@ std::string JsonParser::getToken() {
          token_ += ch;
       }
    }
-
    return token_;
 }
 
+
 /*************************************************/
 void JsonParser::processObject(JsonNode& node) {
-   std::string token = getToken();
-   while (token .size()) {
+   while(true) {
+      std::string key;
+      std::string token;
+
+      if(!getQuoted(getToken(), key)) {
+         setError("Expected key in quotes");
+         break;
+      }
+
+      if(getToken() != ":") {
+         setError("Expected \':\'");
+         break;
+      }
+
+      std::string value = getToken();
+      std::string unquoted;
+      double numValue = 0;
+
+      // new object
+      if( value =="{") {
+         JsonNode& object = node[key];
+         processObject(object);
+      // new array
+      } else if( value =="[") {
+         JsonNode& array = node[key];
+         processArray(array);
+
+      } else if( value =="true") {
+         node[key].setBool(true);
+      } else if( value =="false") {
+         node[key].setBool(false);
+      } else if( value =="null") {
+         node[key].setNull();
+      } else if( getQuoted(value, unquoted)) {
+         node[key] = unquoted;
+      } else if( parseNumber(value, numValue)) {
+         node[key] = numValue;
+      } else {
+         setError("Value type must be number, \"string\", object, array, true, false, or null");
+         break;
+      }
+
       token = getToken();
-      LOG("Line: " << line_ << " Token: \'" << token << "\'");
+
+      // done
+      if(token == "}") {
+         break;
+      } else if(token != ",") {
+         setError("Expected \',\'");
+         break;
+      }
    }
 }
 
 /*************************************************/
 void JsonParser::processArray(JsonNode& node) {
+   while (true) {
 
+      std::string value = getToken();
+      std::string unquoted;
+      double numValue = 0;
+
+      // new object
+      if (value == "{") {
+         JsonNode& object = node.append();
+         processObject(object);
+         // new array
+      } else if (value == "[") {
+         JsonNode& array = node.append();
+         processArray(array);
+
+      } else if (value == "true") {
+         node.append().setBool(true);
+      } else if (value == "false") {
+         node.append().setBool(false);
+      } else if (value == "null") {
+         node.append().setNull();
+      } else if (getQuoted(value, unquoted)) {
+         node.append() = unquoted;
+      } else if (parseNumber(value, numValue)) {
+         node.append() = numValue;
+      }
+
+      std::string token = getToken();
+
+      // done
+      if (token == "]") {
+         break;
+      } else if (token != ",") {
+         setError("Expected \',\'");
+         break;
+      }
+   }
 }
 
 /*************************************************/
@@ -187,8 +282,38 @@ bool JsonParser::isDelimiter(char ch) {
           ch == ']'  || ch == ':'   || ch == '\"';
 }
 
+/*************************************************/
 void JsonParser::setError(const std::string& error) {
    std::stringstream str;
    str << file_ << " ("  << line_ << ") " << error;
    error_ = str.str();
+}
+
+/*************************************************/
+bool JsonParser::getQuoted(const std::string& token, std::string& value) const {
+   if(token.size() > 2) {
+      if(token[0] == '\"' && token[token.size() - 1] == '\"'){
+         value = token.substr(1, token.size() - 2);
+         return true;
+      }
+   }
+
+   return false;
+}
+
+/*************************************************/
+bool JsonParser::parseNumber(const std::string& token, double& value) const {
+   try{
+      size_t index = 0;
+      value = std::stod(token, &index);
+
+      // make sure the whole token is used
+      if(index != token.size()) {
+         return false;
+      } else {
+         return true;
+      }
+   } catch(std::exception& ex) {
+      return false;
+   }
 }

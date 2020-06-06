@@ -53,7 +53,7 @@ TEST(DeepObjects) {
 
 }
 
-TEST(Parse) {
+TEST(ParseCompare) {
    JsonNode object;
 
    JsonNode& array = object["array"];
@@ -79,11 +79,52 @@ TEST(Parse) {
    JsonNode& array2 = object2["item4"];
    array2[3] = 9;
 
-   LOG(object.toString(true));
-
    JsonParser parser;
    JsonNode data = parser.parse(object.toString(true));
 
+   CHECK_EQUAL(object.toString(), data.toString());
+
+}
+
+
+TEST(Parse) {
+   JsonParser parser;
+   JsonNode data = parser.parse("{}");
+
+   CHECK_EQUAL("{}", data.toString(true));
+
+   data = parser.parse("{\n\n key:2 }");
+
+   CHECK_EQUAL(true, parser.hasError());
+
+   CHECK_EQUAL(" (2) Expected key in quotes", parser.getError());
+}
+
+
+TEST(ParseError) {
+   JsonParser parser;
+
+   JsonNode data = parser.parse("{\n \"key\":2,\n\"key2\"\n  : 7,  }");
+
+   CHECK_EQUAL(true, parser.hasError());
+
+   CHECK_EQUAL(" (3) Expected key in quotes", parser.getError());
+}
+
+TEST(ParseErrorAssigment) {
+   JsonParser parser;
+
+   JsonNode data = parser.parse("{\n \"key\" 2,\n\"key2\"\n  : 7,  }");
+
+   CHECK_EQUAL(true, parser.hasError());
+
+   CHECK_EQUAL(" (1) Expected \':\'", parser.getError());
+
+   data = parser.parse("{\n \"key\": 2, \n \"key2\"\n  : 7a,  }");
+
+   CHECK_EQUAL(true, parser.hasError());
+
+   CHECK_EQUAL(" (3) Value type must be number, \"string\", object, array, true, false, or null", parser.getError());
 }
 
 }

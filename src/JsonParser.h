@@ -55,6 +55,17 @@ private:
     * and line number
     */
    void setError(const std::string& error);
+
+   /**
+    * Gets the string without quotes. returns false if no qoutes
+    */
+   bool getQuoted(const std::string& token, std::string& value) const;
+
+   /**
+    * gets a number from a token. If it cannot be converted it will return false
+    */
+   bool parseNumber(const std::string& token, double& value) const;
+
 private:
    std::string json_;
    std::string token_;
