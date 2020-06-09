@@ -70,8 +70,6 @@ private:
 
    void requestHandler(HttpClientContext context);
 
-   bool readRequest(int fd, std::string& request);
-
 private:
 
    std::thread                acceptThread_;

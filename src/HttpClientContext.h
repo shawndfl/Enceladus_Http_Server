@@ -18,7 +18,7 @@ public:
    /**
     * This will be filled in by the server.
     */
-   struct HttpRequest request;
+   HttpRequest  request;
 
    /**
     * The response from the server

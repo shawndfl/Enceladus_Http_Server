@@ -1,6 +1,8 @@
 
 #include "HttpRequest.h"
 #include "Logging.h"
+#include <locale>         // std::locale, std::tolower
+#include <algorithm>
 
 /*************************************************/
 HttpRequest::HttpRequest() :
@@ -30,6 +32,7 @@ bool HttpRequest::ParseRequestLine(const std::string& line) {
       // done with uri
       if (ch == ' ') {
          i++;
+
          break;
       }
       uri += ch;
@@ -58,6 +61,10 @@ bool HttpRequest::ParseRequestLine(const std::string& line) {
       }
       uriPath += ch;
    }
+
+   std::locale loc;
+   std::transform(uriPath.begin(), uriPath.end(), uriPath.begin(),
+       [](unsigned char c){ return std::tolower(c); });
 
    const int KEY = 0;
    const int VALUE = 1;
@@ -178,88 +185,26 @@ bool HttpRequest::AppendToBody(const std::string& chunk) {
 }
 
 /*************************************************/
-void HttpRequest::ParseRequest(const char* buffer, size_t size) {
+void HttpRequest::parseLines(std::vector<std::string>& lines) {
+   method = "";
+   httpVersion = "";
+   uri = "";
+   uriPath ="";
+   uriQuery = "";
+   queryParameters.clear();
+   headers.clear();
+   body = "";
 
-   const char* ch = buffer;
-   std::string token;
-   size_t i = 0;
 
-   while (parsedState != HttpRequest::Complete) {
-
-      // there was an error some where
-      if (parseErrorCode > 0)
-         return;
-
-      switch (parsedState) {
-
-      case HttpRequest::IncompleteStartLine:
-      case HttpRequest::NewRequest:
-         // There is nothing to read
-         // and the message is not complete
-         if (i == size)
-            return;
-
-         // Parse Start Line
-         for (i = 0; i < size; /* increment inside loop*/) {
-            // End of line
-            if (i + 1 < size && ch[i] == '\r' && ch[i + 1] == '\n') {
-               ParseRequestLine(parsedLine);
-               parsedState = HttpRequest::IncompleteHeader;
-               parsedLine.clear(); // reset the parsed line
-               i += 2; // Consume 2 chars
-               break;
-            } else {
-               parsedState = HttpRequest::IncompleteStartLine;
-               parsedLine += ch[i];
-               i++; // Consume 1 char
-            }
-         }
-         break;
-
-      case HttpRequest::IncompleteHeader:
-         // There is nothing to read
-         // and the message is not complete
-         if (i == size)
-            return;
-
-         // Headers
-         for (/* Continue from last loop*/; i < size; /* increment inside loop*/) {
-            // End of header
-            if (i + 3 < size && ch[i] == '\r' && ch[i + 1] == '\n' && ch[i + 2] == '\r' && ch[i + 3] == '\n') {
-               ParseHeaderLine(parsedLine);
-               parsedState = HttpRequest::IncompleteMessage;
-               parsedLine.clear(); // reset the parsed line
-               i += 4; // Consume 4 chars
-               break;
-               // End of one header
-            } else if (i + 1 < size && ch[i] == '\r' && ch[i + 1] == '\n') {
-               ParseHeaderLine(parsedLine);
-               parsedLine.clear(); // reset the parsed line
-               i += 2; // Consume 2 chars
-            } else {
-               parsedState = HttpRequest::IncompleteHeader;
-               if (ch[i] == '\0') {
-                  LOGI("Found null at %zd", i);
-               }
-               parsedLine += ch[i];
-               i++; // Consume 1 char
-            }
-         }
-
-         break;
-      case HttpRequest::IncompleteMessage:
-         //TODO get the message length or chunk and parse it
-         // Message
-         for (; i < size; i++) {
-
-         }
-
-         parsedState = HttpRequest::Complete;
-
-         break;
-      default:
-         LOGE("Unknown parse state: %d ", parsedState);
+   bool requestLine = true;
+   for(auto line: lines) {
+      if(requestLine) {
+         ParseRequestLine(line);
+         requestLine = false;
+      } else {
+         ParseHeaderLine(line);
       }
+      LOG(line.substr(0, line.size()-2));
    }
 }
 

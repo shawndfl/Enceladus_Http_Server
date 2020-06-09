@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Logging.h"
 #include "HttpServer.h"
+#include "HttpHandleFile.h"
 
 bool Handler(HttpClientContext& client, const HttpServerContext& server) {
 
@@ -32,8 +33,13 @@ bool Handler(HttpClientContext& client, const HttpServerContext& server) {
 
 int main(int argc, char *argv[]) {
 
+   using namespace std::placeholders;
+
    HttpServer server;
    server.StartServer(8080);
+
+   HttpHandleFile httpFiles;
+   server.addRequestHandler(std::bind(&HttpHandleFile::Handler, httpFiles, _1, _2));
    server.addRequestHandler(&Handler);
 
    server.JoinAcceptThread();

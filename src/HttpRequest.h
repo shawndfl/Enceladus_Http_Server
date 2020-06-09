@@ -32,6 +32,7 @@ public:
     * ParseRequestLine(), ParseHeaderLine(), and AppendToBody()
     */
    void ParseRequest(const char* buffer, size_t size);
+   void parseLines(std::vector<std::string>& lines);
 
    const std::string& getBody() const;
    const std::vector<Pair>& getHeaders() const;
@@ -137,6 +138,7 @@ private:
 
    /**
     * The path part of the uri. This will not have the query (any thing after the '?')
+    * This path is always lower case
     */
    std::string uriPath;
 

@@ -15,8 +15,7 @@
 
 #define BACKLOG 50
 
-void* readEvent(void * context);
-size_t readn(int fd, HttpRequest& request);
+bool readRequest(HttpClientContext& context);
 size_t writen(int fd, const void* buffer, size_t size);
 
 /*************************************************/
@@ -139,62 +138,6 @@ void HttpServer::acceptHandler() {
 }
 
 /*************************************************/
-#if 0
-size_t readn(int fd, HttpRequest& request) {
-
-   size_t totalBytesRead = 0;
-
-   // There is a chance that our buffer is too small for the
-   // request. This look will allow us to keep reading until we
-   // get a complete request or an error.
-   while (request.getParsedState() != Request::Complete) {
-
-      // Handle parse errors
-      if (request.getParseErrorCode() > 0) {
-         return -1;
-      }
-
-      const size_t size = 4096;
-      char buffer[size] = { 0 };
-      char* chBufer = buffer;
-      volatile size_t bufferBytesRead = 0;
-      volatile size_t bytesRead = 0;
-      while (bufferBytesRead < size) {
-
-         bytesRead = read(fd, chBufer, size - bufferBytesRead);
-         if (bytesRead == (size_t) -1) {
-
-            // Interrupted restart
-            if (errno == EINTR) {
-               continue;
-            } else {
-               LOGE("Error reading %d ", errno);
-               return -1;
-            }
-         }
-
-         // EOF
-         if (bytesRead == 0) {
-            return bufferBytesRead;
-         }
-
-         // Parse the request
-         request.ParseRequest(chBufer, bytesRead);
-
-         // All done. Got the full request.
-         if (request.getParsedState() == Request::Complete) {
-            break;
-         }
-         bufferBytesRead += bytesRead;
-         chBufer += bytesRead;
-         totalBytesRead += bytesRead;
-      }
-   }
-   return totalBytesRead;
-}
-#endif
-
-/*************************************************/
 size_t writen(int fd, const void* buffer, size_t size) {
    char* chBuffer = (char*) buffer;
    size_t totalBytesWrote = 0;
@@ -219,7 +162,63 @@ size_t writen(int fd, const void* buffer, size_t size) {
    return totalBytesWrote;
 }
 
-bool HttpServer::readRequest(int fd, std::string& request) {
+bool readRequest(HttpClientContext& context) {
+
+   const size_t size = 4096;
+   char buffer[size] = { 0 };
+   std::vector<std::string> lines;
+   bool headerDone = false;
+   std::string line;
+
+   while (true) {
+
+      size_t bytesRead = read(context.getSocketfd(), buffer, size);
+      if (bytesRead == (size_t)-1) {
+
+         // Interrupted restart
+         if (errno == EINTR) {
+            continue;
+         } else {
+            LOGE("Error reading %d ", errno);
+            return false;
+         }
+      }
+
+      // loop over each byte
+      for(size_t i = 0; i < bytesRead; i++) {
+
+         if(!headerDone) {
+            // see if we found a new line
+            if(i < bytesRead -1 &&  buffer[i] == '\r' && buffer[i+1] =='\n') {
+
+               line += buffer[i  ];    // save the '\r'
+               line += buffer[++i];    // save the '\n'
+
+               // done with headers but may have a message body
+               if (line == "\r\n") {
+                  headerDone = true;
+               }
+               lines.push_back(line);  // save the line
+
+               line = "";
+
+            } else {
+               line += buffer[i];
+            }
+
+         // collect the body
+         } else {
+            line += buffer[i];
+         }
+      }
+
+      // parse the header we will still need the body
+      if(headerDone) {
+         context.request.parseLines(lines);
+         break;
+      }
+
+   }
 
    return true;
 }
@@ -232,9 +231,8 @@ void HttpServer::requestHandler(HttpClientContext context) {
    while (true) {
 
       // Read the request
-      std::string request;
-      if (!readRequest(context.getSocketfd(), request)) {
-         LOGE("Error reading request from %d: %s", context.getSocketfd(), request.c_str());
+      if (!readRequest(context)) {
+         LOGE("Error reading request from %d:", context.getSocketfd());
          break;
       }
 
