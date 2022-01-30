@@ -4,7 +4,7 @@
 #include <chrono>
 #include <stdio.h>
 #include <stdarg.h>
-#include <time.h>
+#include <sys/time.h>
 #include <sstream>
 #include <iostream>
 #include <iomanip>
@@ -33,9 +33,9 @@ void Logging::logit(const char logType,
       int line,
       const std::string& text) {
 
-   auto t = std::chrono::high_resolution_clock::now();
-   std::time_t time = std::chrono::system_clock::to_time_t(t);
-   std::tm* now = std::localtime(&time);
+   struct timeval curTime;
+   gettimeofday(&curTime, NULL);
+   struct tm* time =localtime(&curTime.tv_sec);
 
    const int fileSize = 20;
    std::string filename;
@@ -46,10 +46,14 @@ void Logging::logit(const char logType,
    }
 
    std::cout << logType
-         << " (" << now->tm_hour  << ":"
-         << now->tm_min  << ":"
-         << now->tm_sec
+         << " (" << time->tm_hour  << ":"
+         << time->tm_min  << ":"
+         << time->tm_sec << "."
+			<< std::fixed
+			<<  std::setw(6)
+			<< std::setfill('0') << curTime.tv_usec
          <<  ") "
+			<< std::setfill(' ')
          << std::setw(fileSize)
          << filename << ":"
          << line << " "

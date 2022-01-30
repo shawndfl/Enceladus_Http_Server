@@ -4,7 +4,7 @@
 #include <locale>         // std::locale, std::tolower
 #include <algorithm>
 
-/*************************************************/
+ /*************************************************/
 HttpRequest::HttpRequest() :
       parseErrorCode(0), parsedState(HttpRequest::NewRequest) {
 
