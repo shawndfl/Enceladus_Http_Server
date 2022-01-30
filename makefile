@@ -1,5 +1,5 @@
 
-APP:=bin/BlockSimulatedKingdom
+APP:=bin/http_server
 
 SRC_CC := $(wildcard ./src/*.cc)
 SRC := $(notdir $(SRC_CC:%.cc=%))
@@ -17,6 +17,12 @@ LDLIBS := -lstdc++ -pthread
 all: $(APP)
 	@echo Done making $(APP)
 
+#
+# build
+#
+test:
+	make -C unittests debug	
+	
 #
 # Debug the app
 #
@@ -47,6 +53,7 @@ env:
 #
 clean:
 	@echo cleaning
+	@make -C unittests clean 
 	@rm -f bin/*
 	@rm -f $(APP)
 

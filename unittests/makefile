@@ -1,5 +1,5 @@
 
-APP:=bin/unitTests
+APP:=bin/unit_tests
 
 SRC_CC := $(wildcard ../src/*.cc) $(wildcard ./*.cc)
 SRC_CPP := $(wildcard ./UnitTest++/*.cpp) $(wildcard ./UnitTest++/Posix/*.cpp)
