@@ -15,14 +15,17 @@ SUITE(UriFormater) {
 TEST(InitTest) {
    RequestFormater formater;
    std::string path;
-   path = formater.getResourcePath("/opt//test", "http");
-   LOG("path " << path);
+   path = formater.getResourcePath("./../UnitTest++", "Checks.h");
+   CHECK(path.size() > 0);
 
-   path = formater.getResourcePath("/opt/../test//", "http");
-   LOG("path " << path);
+   path = formater.getResourcePath("./../UnitTest++", "../..//makefile");
+   CHECK(path.size() == 0);
 
-   path = formater.getResourcePath("/opt/../../../test", "http");
-   LOG("path " << path);
+   path = formater.getResourcePath("./../UnitTest++", "missing_file");
+   CHECK(path.size() == 0);
+
+   path = formater.getResourcePath("./", "unit_tests");
+   CHECK(path.size() > 0);
 }
 }
 

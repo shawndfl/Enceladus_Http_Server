@@ -15,6 +15,7 @@ LDLIBS := -lstdc++ -pthread
 # Bulid app
 #
 all: $(APP)
+	@make -C unittests debug	
 	@echo Done making $(APP)
 
 #
