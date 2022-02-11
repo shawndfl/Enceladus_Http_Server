@@ -1,0 +1,8 @@
+{
+   "listeningPort": 8080,
+   "cert": "filename",
+   "pass": "password",
+   "threads": 20,
+   "content": "../http"
+   
+}

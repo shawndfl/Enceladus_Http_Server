@@ -28,7 +28,7 @@ HttpServer::~HttpServer() {
 }
 
 /*************************************************/
-bool HttpServer::StartServer(int port) {
+bool HttpServer::StartServer(uint port, uint threadCount) {
 
 	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
 		LOGE("Cannot filter SIGPIPE");
@@ -78,15 +78,19 @@ bool HttpServer::StartServer(int port) {
 
 	LOGI("Listening on port %d", serverContext_.getPort());
 
-	std::thread accept(&HttpServer::acceptHandler, this);
-	acceptThread_ = std::move(accept);
+	acceptThread_ = std::thread(&HttpServer::acceptHandler, this);
+
+	for(uint i = 0; i < threadCount; i++) {
+	   std::thread clientThread(&HttpServer::requestHandler, this, serverContext_);
+	   requestThreads_.push_back(std::move(clientThread));
+	}
 
 	return true;
 }
 
 /*************************************************/
 void HttpServer::shutdown() {
-	std::lock_guard<std::mutex> lock(mutex_);
+	std::lock_guard<std::mutex> lock(requestMutex_);
 	shutdown_ = true;
 }
 
@@ -108,32 +112,40 @@ void HttpServer::addRequestHandler(HttpRequestHandler handler) {
 /*************************************************/
 void HttpServer::acceptHandler() {
 
-	while (true) {
+   while (true) {
 
-		struct sockaddr clientAddr;
-		socklen_t addrLen = sizeof(clientAddr);
-		int clientfd = accept(serverContext_.getSocketfd(), &clientAddr,
-				&addrLen);
-		if (clientfd < 0) {
-			LOGE("Error accept %d %d", clientfd, errno);
-			break;
-		}
+      struct sockaddr clientAddr;
+      socklen_t addrLen = sizeof(clientAddr);
+      int clientfd = accept(serverContext_.getSocketfd(), &clientAddr, &addrLen);
+      if (clientfd < 0) {
+         LOGE("Error accept %d %d", clientfd, errno);
+         break;
+      }
 
-		{
-			// see if we should exit this loop
-			std::lock_guard<std::mutex> lock(mutex_);
-			if (shutdown_) {
-				break;
-			}
-		}
+      //TODO add ip address of client
+      LOGI("Got a client %d", clientfd);
 
-		//TODO add ip address of client
-		LOGI("Got a client %d", clientfd);
+      // create the client context
+      std::shared_ptr<HttpClientContext> context
+         = std::make_shared<HttpClientContext>(clientfd);
 
-		HttpClientContext context(clientfd);
-		std::thread clientThread(&HttpServer::requestHandler, this, context);
-		requestThreads_.push_back(std::move(clientThread));
-	}
+      std::unique_lock<std::mutex> lock(requestMutex_);
+
+      // see if we should exit this loop
+      if (shutdown_) {
+         clientConnectCondition_.notify_all();
+         break;
+      }
+
+      // push the request
+      requestQueue_.push(context);
+
+      // Manual unlocking is done before notifying, to avoid waking up
+      // the waiting thread only to block again (see notify_one for details)
+      lock.unlock();
+      clientConnectCondition_.notify_one();
+
+   }
 
 }
 
@@ -226,40 +238,59 @@ bool readRequest(HttpClientContext &context) {
 }
 
 /*************************************************/
-void HttpServer::requestHandler(HttpClientContext context) {
-
-	LOGI("Got a client");
+void HttpServer::requestHandler(const HttpServerContext& context) {
 
 	while (true) {
 
-		// Read the request
-		if (!readRequest(context)) {
-			LOGE("Error reading request from %d:", context.getSocketfd());
-			break;
-		}
+      std::shared_ptr<HttpClientContext> context;
+      {
+         std::unique_lock<std::mutex> lock(requestMutex_);
+         clientConnectCondition_.wait(lock);
 
-		// Set the http version
-		context.response.httpVersion = HTTP_VERSION;
+         // exit if needed
+         if (shutdown_) {
+            break;
+         }
 
-		// Fill in the date header
-		char buf[200];
-		time_t now = time(0);
-		struct tm tm = *gmtime(&now);
+         // get a request
+         if (requestQueue_.size() > 0) {
+            context = requestQueue_.front();
+            requestQueue_.pop();
+         } else {
+            continue;
+         }
+      }
 
-		// Sun, 06 Nov 1994 08:49:37 GMT
-		strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %Z", &tm);
-		context.response.appendHeader("Date", std::string(buf));
+      LOG("Reading request on: " << std::this_thread::get_id());
 
-		// Fill in the server Header
-		context.response.appendHeader("Server", "Embedded");
+      // Read the request
+      if (!readRequest(*context)) {
+         LOG("Error reading request from " << context->getSocketfd());
+         break;
+      }
 
-		// Let the user handle the request
-		for (auto filter : filters_) {
-			if (filter(context, serverContext_)) {
-				break;
-			}
-		}
+      // Set the http version
+      context->response.httpVersion = HTTP_VERSION;
 
-		break;
-	}
+      // Fill in the date header
+      char buf[200];
+      time_t now = time(0);
+      struct tm tm = *gmtime(&now);
+
+      // Sun, 06 Nov 1994 08:49:37 GMT
+      strftime(buf, sizeof buf, "%a, %d %b %Y %H:%M:%S %Z", &tm);
+      context->response.appendHeader("Date", std::string(buf));
+
+      // Fill in the server Header
+      context->response.appendHeader("Server", "Embedded");
+
+      // Let the user handle the request
+      for (auto filter : filters_) {
+         if (filter(*context, serverContext_)) {
+            break;
+         }
+      }
+   }
+
+	LOG("Exiting thread " << std::this_thread::get_id());
 }

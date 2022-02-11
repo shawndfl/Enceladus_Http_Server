@@ -29,32 +29,32 @@ public:
    /**
     * set value for string type
     */
-   void set(const std::string& value);
+   JsonNode&  setString(const std::string& value);
 
    /**
     * sets value for number type
     */
-   void set(double value);
+   JsonNode&  setNumber(double value);
 
    /**
     * Sets true
     */
-   void setBool(bool value);
+   JsonNode&  setBool(bool value);
 
    /**
     * Sets null
     */
-   void setNull();
+   JsonNode&  setNull();
 
    /**
     * Sets value for object
     */
-   void set(const std::string& key, const JsonNode& value);
+   JsonNode&  setObject(const std::string& key, const JsonNode& value);
 
    /**
     * Sets value in array
     */
-   void set(int index, const JsonNode& value);
+   JsonNode&  setArray(int index, const JsonNode& value);
 
    /**
     * Creates an element at the end of an array
@@ -73,7 +73,7 @@ public:
 
    JsonNode& operator[](int index);
 
-   JsonNode& operator[](const std::string& key);
+   JsonNode& operator[](const std::string& value);
 
    JsonNode& operator=(int value);
 
@@ -88,6 +88,10 @@ public:
    JsonNode& operator=(const char* value);
 
    JsonNode& operator=(const std::string& value);
+
+   std::string  getString(const std::string& key, const std::string& defaultValue = 0);
+   double       getNumber(const std::string& key, const double defaultValue = 0.0);
+   bool         getBool(const std::string& key, const bool defaultValue = false);
 
 private:
 

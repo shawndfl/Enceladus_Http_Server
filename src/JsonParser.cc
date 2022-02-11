@@ -7,16 +7,17 @@
 
 #include "JsonParser.h"
 #include <sstream>
+#include <fstream>
 #include "Logging.h"
 
 constexpr const char* whiteSpace = "\r\n\t ";
-constexpr const char* startArray = "[";
-constexpr const char* endArray = "]";
-constexpr const char* startObject = "{";
-constexpr const char* endObject = "}";
-constexpr const char* assigment = ":";
-constexpr const char* comma = ",";
-constexpr const char* quote = "\"";
+constexpr const char  startArray = '[';
+constexpr const char  endArray = ']';
+constexpr const char  startObject = '{';
+constexpr const char  endObject = '}';
+constexpr const char  assigment = ':';
+constexpr const char  comma = ',';
+constexpr const char*  quote = "\"\'";
 
 /*************************************************/
 JsonParser::JsonParser() {
@@ -61,6 +62,27 @@ const JsonNode& JsonParser::parseFile(const std::string& file) {
    error_ = "";
    token_ = "";
    node_.clear();
+
+   std::ifstream stream;
+   stream.open(file);
+   if(stream.is_open()) {
+      std::stringstream sstream;
+      sstream << stream.rdbuf();
+      json_ = sstream.str();
+      stream.close();
+
+      std::string token = getToken();
+      if (token == "{") {
+         processObject(node_);
+      } else if (token == "[") {
+         processArray(node_);
+      } else {
+         setError("expected object or array");
+      }
+   } else {
+      LOG("Cannot open file " << file);
+   }
+
    return node_;
 }
 
@@ -169,7 +191,7 @@ std::string JsonParser::getToken() {
 
 
 /*************************************************/
-void JsonParser::processObject(JsonNode& node) {
+bool JsonParser::processObject(JsonNode& node) {
    while(true) {
       std::string key;
       std::string token;
@@ -179,33 +201,48 @@ void JsonParser::processObject(JsonNode& node) {
          break;
       }
 
-      if(getToken() != ":") {
+      token = getToken();
+
+      // empty object return false
+      // and the parent node will be set to null
+      if (token == "}") {
+         return false;
+      }
+      // non empty object will have a ":" next
+      else if (token != ":") {
          setError("Expected \':\'");
          break;
       }
+
 
       std::string value = getToken();
       std::string unquoted;
       double numValue = 0;
 
       // new object
-      if( value =="{") {
-         JsonNode& object = node[key];
-         processObject(object);
+      if (value == "{") {
+         JsonNode &object = node[key];
+         if (!processObject(object)) {
+            node.setNull();
+         }
+      }
       // new array
-      } else if( value =="[") {
-         JsonNode& array = node[key];
-         processArray(array);
+      else if (value == "[") {
+         JsonNode &item = node.append();
+         if (!processArray(item)) {
+            node.setNull();
+            break;
+         }
 
-      } else if( value =="true") {
+      } else if (value == "true") {
          node[key].setBool(true);
-      } else if( value =="false") {
+      } else if (value == "false") {
          node[key].setBool(false);
-      } else if( value =="null") {
+      } else if (value == "null") {
          node[key].setNull();
-      } else if( getQuoted(value, unquoted)) {
+      } else if (getQuoted(value, unquoted)) {
          node[key] = unquoted;
-      } else if( parseNumber(value, numValue)) {
+      } else if (parseNumber(value, numValue)) {
          node[key] = numValue;
       } else {
          setError("Value type must be number, \"string\", object, array, true, false, or null");
@@ -222,15 +259,21 @@ void JsonParser::processObject(JsonNode& node) {
          break;
       }
    }
+   return true;
 }
 
 /*************************************************/
-void JsonParser::processArray(JsonNode& node) {
+bool JsonParser::processArray(JsonNode& node) {
    while (true) {
 
       std::string value = getToken();
       std::string unquoted;
       double numValue = 0;
+
+      if (getToken() == "]") {
+         node.setNull();
+         return false;
+      }
 
       // new object
       if (value == "{") {
@@ -263,6 +306,7 @@ void JsonParser::processArray(JsonNode& node) {
          break;
       }
    }
+   return true;
 }
 
 /*************************************************/

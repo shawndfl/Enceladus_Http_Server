@@ -9,6 +9,7 @@
 #include <thread>
 #include <mutex>
 #include <vector>
+#include <condition_variable>
 #include "HttpClientContext.h"
 #include "HttpServerContext.h"
 #include "HttpRequest.h"
@@ -31,7 +32,7 @@ public:
     * This will spin up an accept thread. As clients connect
     * they will each get their own thread.
     */
-   bool StartServer(int port);
+   bool StartServer(uint port, uint threadCount);
 
    /**
     * Parses what we just got from the client.
@@ -68,17 +69,22 @@ private:
 
    void acceptHandler();
 
-   void requestHandler(HttpClientContext context);
+   void requestHandler(const HttpServerContext& context);
 
 private:
 
-   std::thread                acceptThread_;
-   std::vector<HttpRequestHandler>         filters_;
-   HttpServerContext          serverContext_;
+   typedef std::queue<std::shared_ptr<HttpClientContext> > RequestQueue;
 
-   bool                       shutdown_;
-   std::mutex                 mutex_;
-   std::vector<std::thread>   requestThreads_;
+   std::thread                      acceptThread_;
+   std::vector<HttpRequestHandler>  filters_;
+   HttpServerContext                serverContext_;
+
+   RequestQueue                     requestQueue_;
+   std::mutex                       requestMutex_;
+   std::vector<std::thread>         requestThreads_;
+   bool                             shutdown_;
+
+   std::condition_variable          clientConnectCondition_;
 
 };
 

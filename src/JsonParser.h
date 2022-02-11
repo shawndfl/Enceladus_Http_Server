@@ -44,9 +44,9 @@ private:
     */
    std::string getToken();
 
-   void processObject(JsonNode& node);
+   bool processObject(JsonNode& node);
 
-   void processArray(JsonNode& node);
+   bool processArray(JsonNode& node);
 
    bool isDelimiter(char ch);
 

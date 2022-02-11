@@ -8,8 +8,8 @@ SUITE(Json) {
 TEST(ToString) {
    JsonNode node;
    JsonNode value;
-   value.set(12);
-   node.set("test", value);
+   value.setNumber(12);
+   node.setObject("test", value);
    CHECK_EQUAL("{\"test\":12.000000}", node.toString());
 
 }

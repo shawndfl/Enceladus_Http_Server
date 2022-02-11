@@ -19,29 +19,46 @@ JsonNode::~JsonNode() {
 }
 
 /*************************************************/
-void JsonNode::set(const std::string& value) {
+JsonNode& JsonNode::setString(const std::string& value) {
+   type_= JsonString;
+   valueStr_ = value;
+   return *this;
 }
 
 /*************************************************/
-void JsonNode::set(double value) {
+JsonNode& JsonNode::setNumber(double value) {
    type_= JsonNumber;
    valueNum_ = value;
+   return *this;
 }
 
 /*************************************************/
-void JsonNode::setBool(bool value) {
+JsonNode& JsonNode::setBool(bool value) {
    type_= value?  JsonTrue: JsonFalse;
+   return *this;
 }
 
 /*************************************************/
-void JsonNode::setNull() {
+JsonNode& JsonNode::setNull() {
    type_= JsonNull;
+   return *this;
 }
 
 /*************************************************/
-void JsonNode::set(const std::string& key, const JsonNode& value) {
+JsonNode& JsonNode::setObject(const std::string& key, const JsonNode& value) {
    type_= JsonObject;
    valueObj_[key] = value;
+   return *this;
+}
+
+/*************************************************/
+JsonNode& JsonNode::setArray(int index, const JsonNode &value) {
+   type_ = JsonArray;
+   JsonNode newNode;
+   for (int i = valueArray_.size(); i <= index; i++) {
+      valueArray_.push_back(JsonNode());
+   }
+   return valueArray_[index];
 }
 
 /*************************************************/
@@ -69,6 +86,110 @@ std::string JsonNode::toString(bool humanReadable) const {
       json = "{}";
    }
    return json;
+}
+
+/*************************************************/
+std::string JsonNode::getString(const std::string &key, const std::string &defaultValue) {
+   auto itt = valueObj_.find(key);
+   if(itt == valueObj_.end() || (*itt).second.type_ != JsonString) {
+      return defaultValue;
+   } else {
+      return (*itt).second.valueStr_;
+   }
+}
+
+/*************************************************/
+double JsonNode::getNumber(const std::string &key, const double defaultValue) {
+   auto itt = valueObj_.find(key);
+   if (itt == valueObj_.end() || (*itt).second.type_ != JsonNumber) {
+      return defaultValue;
+   } else {
+      return (*itt).second.valueNum_;
+   }
+}
+
+/*************************************************/
+bool JsonNode::getBool(const std::string &key, const bool defaultValue) {
+   auto itt = valueObj_.find(key);
+
+   if (itt == valueObj_.end() ||
+         ((*itt).second.type_ != JsonFalse &&
+          (*itt).second.type_ != JsonTrue)) {
+      return defaultValue;
+   } else {
+      return (*itt).second.valueNum_ == 1;
+   }
+}
+
+/*************************************************/
+JsonNode& JsonNode::append() {
+   type_= JsonArray;
+   valueArray_.push_back(JsonNode());
+   return valueArray_[valueArray_.size() - 1];
+}
+
+/*************************************************/
+JsonNode& JsonNode::operator [](int index) {
+   type_ = JsonArray;
+   JsonNode newNode;
+   // add nodes until we get to this index
+   for (int i = valueArray_.size(); i <= index; i++) {
+      valueArray_.push_back(JsonNode());
+   }
+   return valueArray_[index];
+}
+
+/*************************************************/
+JsonNode& JsonNode::operator [](const std::string& key) {
+   type_= JsonObject;
+   return valueObj_[key];
+}
+
+/*************************************************/
+JsonNode& JsonNode::operator =(ulong value) {
+   return setNumber(value);
+}
+
+/*************************************************/
+JsonNode& JsonNode::operator =(int value) {
+   type_= JsonNumber;
+   valueNum_ = value;
+   return *this;
+}
+
+/*************************************************/
+JsonNode& JsonNode::operator =(uint value) {
+   type_= JsonNumber;
+   valueNum_ = value;
+   return *this;
+}
+
+/*************************************************/
+JsonNode& JsonNode::operator =(long value) {
+   type_= JsonNumber;
+   valueNum_ = value;
+   return *this;
+}
+
+/*************************************************/
+JsonNode& JsonNode::operator =(double value) {
+   type_= JsonNumber;
+   valueNum_ = value;
+   return *this;
+}
+
+/*************************************************/
+JsonNode& JsonNode::operator =(const std::string& value) {
+   type_= JsonString;
+   valueStr_ = value;
+   return *this;
+}
+
+/*************************************************/
+JsonNode& JsonNode::operator =(const char* value) {
+   type_= JsonString;
+   valueStr_ = value;
+   return *this;
 }
 
 /*************************************************/
@@ -187,74 +308,3 @@ void JsonNode::toStringImpl(std::string& json) const {
    }
 }
 
-/*************************************************/
-JsonNode& JsonNode::append() {
-   type_= JsonArray;
-   valueArray_.push_back(std::move(JsonNode()));
-   return valueArray_[valueArray_.size() - 1];
-}
-
-/*************************************************/
-JsonNode& JsonNode::operator [](int index) {
-   type_= JsonArray;
-   JsonNode newNode;
-   for(int i = valueArray_.size(); i <= index; i++){
-      valueArray_.push_back(JsonNode());
-   }
-   return valueArray_[index];
-}
-
-/*************************************************/
-JsonNode& JsonNode::operator [](const std::string& key) {
-   type_= JsonObject;
-   return valueObj_[key];
-}
-
-/*************************************************/
-JsonNode& JsonNode::operator =(ulong value) {
-   type_= JsonNumber;
-   valueNum_ = value;
-   return *this;
-}
-
-/*************************************************/
-JsonNode& JsonNode::operator =(int value) {
-   type_= JsonNumber;
-   valueNum_ = value;
-   return *this;
-}
-
-/*************************************************/
-JsonNode& JsonNode::operator =(uint value) {
-   type_= JsonNumber;
-   valueNum_ = value;
-   return *this;
-}
-
-/*************************************************/
-JsonNode& JsonNode::operator =(long value) {
-   type_= JsonNumber;
-   valueNum_ = value;
-   return *this;
-}
-
-/*************************************************/
-JsonNode& JsonNode::operator =(double value) {
-   type_= JsonNumber;
-   valueNum_ = value;
-   return *this;
-}
-
-/*************************************************/
-JsonNode& JsonNode::operator =(const std::string& value) {
-   type_= JsonString;
-   valueStr_ = value;
-   return *this;
-}
-
-/*************************************************/
-JsonNode& JsonNode::operator =(const char* value) {
-   type_= JsonString;
-   valueStr_ = value;
-   return *this;
-}
