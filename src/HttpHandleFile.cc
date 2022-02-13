@@ -8,6 +8,7 @@
 #include "HttpHandleFile.h"
 #include "Logging.h"
 #include "HttpFileSystem.h"
+#include "Config.h"
 #include <fstream>
 
 /*************************************************/
@@ -21,8 +22,13 @@ HttpHandleFile::~HttpHandleFile() {
 /*************************************************/
 bool HttpHandleFile::Handler(HttpClientContext& client, const HttpServerContext& server) {
    bool handled = false;
-   std::string path = "http/content/" + client.request.getUriPath();
+   const Config& config = Config::get();
+
+   std::string path = config.content + client.request.getUriPath();
    std::string ext = HttpFileSystem::getExtenion(path);
+
+   // TODO check absolute path
+
    if(HttpFileSystem::exists(path)) {
       std::ifstream t(path);
       std::string body;
@@ -34,8 +40,25 @@ bool HttpHandleFile::Handler(HttpClientContext& client, const HttpServerContext&
       body.assign((std::istreambuf_iterator<char>(t)),
                   std::istreambuf_iterator<char>());
 
+      // set the content type
+      if (ext == ".html") {
+         client.response.appendHeader("Content-Type", "text/html");
+      } else if (ext == ".json") {
+         client.response.appendHeader("Content-Type", "application/json");
+      } else if (ext == ".js") {
+         client.response.appendHeader("Content-Type", "application/javascript");
+      } else if (ext == ".png") {
+         client.response.appendHeader("Content-Type", "image/png");
+      } else if (ext == ".jpg") {
+         client.response.appendHeader("Content-Type", "text/jpg");
+      } else {
+         client.response.appendHeader("Content-Type", "text/plain");
+      }
+
       client.response.body = body;
-      client.response.statusCode = HttpResponse::CODE202;
+
+      client.response.appendHeader("X-Content-Type-Options", "nosniff");
+      client.response.statusCode = HttpResponse::CODE200;
       client.SendResponse();
       handled = true;
    }

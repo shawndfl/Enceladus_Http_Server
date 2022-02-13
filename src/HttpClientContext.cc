@@ -31,7 +31,9 @@ void HttpClientContext::SendResponse() {
 
    // Write the body
    out += response.body;
-
+   LOG("---");
+   LOG(out);
+   LOG("---");
    size_t bytesSent = write(socketfd_, out.c_str(), out.size());
    if (bytesSent < 0) {
       //EROFS

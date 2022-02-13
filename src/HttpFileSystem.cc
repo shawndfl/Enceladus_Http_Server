@@ -20,6 +20,15 @@ HttpFileSystem::~HttpFileSystem() {
 }
 
 /*************************************************/
+std::string HttpFileSystem::toLower(const std::string& text) {
+   std::string lower;
+   for(size_t i = 0; i < text.size(); i++) {
+      lower += std::tolower(text[i]);
+   }
+   return lower;
+}
+
+/*************************************************/
 std::string HttpFileSystem::getExtenion(const std::string& path) {
    size_t offset = path.find_last_of('.');
    if(offset != std::string::npos) {

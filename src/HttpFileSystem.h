@@ -19,6 +19,8 @@ public:
 
    static bool exists(const std::string& file);
 
+   static std::string toLower(const std::string& text);
+
 };
 
 #endif /* SRC_HTTPFILESYSTEM_H_ */
