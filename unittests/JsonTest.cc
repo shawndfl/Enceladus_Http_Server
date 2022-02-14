@@ -5,6 +5,7 @@
 
 SUITE(Json) {
 
+/*************************************************/
 TEST(ToString) {
    JsonNode node;
    JsonNode value;
@@ -14,6 +15,7 @@ TEST(ToString) {
 
 }
 
+/*************************************************/
 TEST(Array) {
    JsonNode node;
    node.append() = 12;
@@ -22,6 +24,7 @@ TEST(Array) {
 
 }
 
+/*************************************************/
 TEST(DeepObjects) {
    JsonNode object;
 

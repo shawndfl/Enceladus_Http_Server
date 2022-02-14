@@ -46,6 +46,8 @@ public:
    const std::string& getUriPath() const;
    const std::string& getUriQuery() const;
 
+   std::string getHeader(const std::string& header) const;
+
 private:
    /**
     * Parses the request line. This is the first line in

@@ -10,5 +10,8 @@ export function start() {
       panel[0].innerHTML = text;
     }           
   });
+  
+  let ws = new Async.Socket();
+  ws.connect("ws://localhost:8080/echo");
    
 }

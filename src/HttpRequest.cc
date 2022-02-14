@@ -11,6 +11,16 @@ HttpRequest::HttpRequest() :
 }
 
 /*************************************************/
+std::string HttpRequest::getHeader(const std::string& header) const {
+   for(int i =0; i < headers.size(); i++) {
+      if(headers[i].first == header) {
+         return headers[i].second;
+      }
+   }
+   return "";
+}
+
+/*************************************************/
 bool HttpRequest::ParseRequestLine(const std::string& line) {
    size_t i = 0;
 
