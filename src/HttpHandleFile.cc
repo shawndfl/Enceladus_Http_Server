@@ -31,6 +31,11 @@ bool HttpHandleFile::Handler(HttpClientContext& client, const HttpServerContext&
 
    if(HttpFileSystem::exists(path)) {
       std::ifstream t(path);
+
+      // error but it was handled
+      if(!t.is_open()) {
+         return true;
+      }
       std::string body;
 
       t.seekg(0, std::ios::end);
@@ -59,7 +64,7 @@ bool HttpHandleFile::Handler(HttpClientContext& client, const HttpServerContext&
 
       client.response.appendHeader("X-Content-Type-Options", "nosniff");
       client.response.statusCode = HttpResponse::CODE200;
-      client.SendResponse();
+      client.sendResponse();
       handled = true;
    }
 

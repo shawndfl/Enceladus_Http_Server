@@ -10,9 +10,36 @@
 #include "RequestFormater.h"
 #include "JsonParser.h"
 #include "Base64.h"
+#include "sha1.h"
 #include <bitset>
+#include <sstream>
+#include <iomanip>      // std::setfill, std::setw
 
 SUITE(UriFormater) {
+
+TEST(sha1) {
+   SHA1 sha1;
+   std::string response = "dGhlIHNhbXBsZSBub25jZQ==258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+   sha1.Input(response.c_str(), response.size());
+
+   unsigned char dig[20];
+   sha1.Result((unsigned*)dig);
+
+   std::stringstream debug;
+
+   size_t count =  sizeof(dig);
+   LOG("count " << count);
+   for(size_t i = 0; i < count; i++) {
+      debug << " 0x" << std::setw(2) << std::setfill('0') << std::hex << (unsigned )(dig[i]);
+   }
+
+   std::string expected =" 0xb3 0x7a 0x4f 0x2c 0xc0 0x62 0x4f 0x16 0x90 0xf6 0x46 0x06 0xcf 0x38 0x59 0x45 0xb2 0xbe 0xc4 0xea";
+   CHECK_EQUAL(expected,  debug.str());
+
+   std::string encoding = Base64::encode((char*)dig, count);
+   expected = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=";
+   CHECK_EQUAL(expected, encoding);
+}
 
 TEST(base64DecodeErrors) {
 
@@ -93,7 +120,6 @@ TEST(base64Encoding3) {
    }
 }
 
-
 TEST(InitTest) {
    RequestFormater formater;
    std::string path;
@@ -110,5 +136,4 @@ TEST(InitTest) {
    CHECK(path.size() > 0);
 }
 }
-
 

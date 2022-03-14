@@ -8,6 +8,7 @@
 #include "HttpFileSystem.h"
 #include "fstream"
 #include "Logging.h"
+#include <sys/stat.h>
 #include <unistd.h>
 
 /*************************************************/
@@ -30,9 +31,15 @@ std::string HttpFileSystem::toLower(const std::string& text) {
 
 /*************************************************/
 std::string HttpFileSystem::getExtenion(const std::string& path) {
-   size_t offset = path.find_last_of('.');
-   if(offset != std::string::npos) {
-      return path.substr(offset);
+   size_t dot = path.find_last_of('.');
+   size_t slash = path.find_last_of('/');
+
+   if(dot < slash) {
+      dot = std::string::npos;
+   }
+
+   if(dot != std::string::npos) {
+      return path.substr(dot);
    } else {
       return "";
    }
@@ -40,10 +47,20 @@ std::string HttpFileSystem::getExtenion(const std::string& path) {
 
 /*************************************************/
 bool HttpFileSystem::exists(const std::string& filename) {
-   if (FILE *file = fopen(filename.c_str(), "r")) {
-          fclose(file);
-          return true;
-      } else {
-          return false;
+   struct stat st;
+   if(stat(filename.c_str(), &st) != -1) {
+      if((st.st_mode & S_IFMT) == S_IFREG) {
+         return true;
       }
+   }
+   return false;
+/*
+   if (FILE *file = fopen(filename.c_str(), "r")) {
+      if( S_IFDIR(
+      fclose(file);
+      return true;
+   } else {
+      return false;
+   }
+   */
 }

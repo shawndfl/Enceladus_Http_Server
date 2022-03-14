@@ -18,13 +18,11 @@ export class Socket {
   connect(url, onMessage) {
     this.ws = new WebSocket(url);
     
-    this.ws.onopen = function() {
-      // Web Socket is connected, send data using send()
-      ws.send("Testing");
-      alert("Message is sent...");
+    this.ws.onopen = ()=> {
+      console.debug("Open connection")      
     };
 
-    this.ws.onmessage = function(evt) {
+    this.ws.onmessage = (evt) => {
       let data = evt.data;
       console.debug(data)
       if(onMessage != undefined) {        
@@ -32,7 +30,7 @@ export class Socket {
       }
     };
 
-    this.ws.onclose = function() {
+    this.ws.onclose = () => {
 
       // websocket is closed.
       console.debug("closing");

@@ -12,6 +12,9 @@ export function start() {
   });
   
   let ws = new Async.Socket();
-  ws.connect("ws://localhost:8080/echo");
+  ws.connect("ws://localhost:8080/echo", (data)=> {    
+    console.debug("got this " + data);
+    ws.send("Hello " + data);
+  });   
    
 }

@@ -25,7 +25,7 @@ bool Handler(HttpClientContext& client, const HttpServerContext& server) {
 
    client.response.appendHeader("Content-Type", "text/html; charset=ISO-8859-1");
    client.response.body = body;
-   client.SendResponse();
+   client.sendResponse();
 
    //LOGI("Is render initialized %i", render->isInitialized());
    return true;
