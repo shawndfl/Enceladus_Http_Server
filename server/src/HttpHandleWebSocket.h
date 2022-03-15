@@ -19,7 +19,24 @@ public:
    HttpHandleWebSocket();
    virtual ~HttpHandleWebSocket();
 
-   bool Handler(HttpClientContext& client, const HttpServerContext& server);
+   /**
+    * Handles the web socket request
+    */
+   virtual bool Handler(HttpClientContext& client, const HttpServerContext& server);
+
+protected:
+
+   /**
+    * Initializes the web socket
+    */
+   virtual bool start(HttpClientContext& client, const HttpServerContext& server) = 0;
+
+   /**
+    * Call update
+    */
+   virtual bool update() = 0;
+
+   virtual void close() = 0;
 };
 
 #endif /* SRC_HTTPHANDLEWEBSOCKET_H_ */

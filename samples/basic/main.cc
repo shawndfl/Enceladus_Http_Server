@@ -41,6 +41,14 @@ int main(int argc, char *argv[]) {
    HttpServer server;
    server.StartServer(config.listeningPort, config.threads);
 
+   using namespace std::placeholders;
+
+   // setup default handlers
+   HttpHandleFile httpFiles;
+   HttpHandleWebSocket websockets;
+   addRequestHandler(std::bind(&HttpHandleFile::Handler, httpFiles, _1, _2));
+   addRequestHandler(std::bind(&HttpHandleWebSocket::Handler, websockets, _1, _2));
+
    server.addRequestHandler(&Handler);
 
    server.JoinAcceptThread();

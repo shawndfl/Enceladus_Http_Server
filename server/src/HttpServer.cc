@@ -87,14 +87,6 @@ bool HttpServer::StartServer(uint port, uint threadCount) {
 	   requestThreads_.push_back(std::move(clientThread));
 	}
 
-	using namespace std::placeholders;
-
-	// setup default handlers
-	HttpHandleFile httpFiles;
-	HttpHandleWebSocket websockets;
-	addRequestHandler(std::bind(&HttpHandleFile::Handler, httpFiles, _1, _2));
-	addRequestHandler(std::bind(&HttpHandleWebSocket::Handler, websockets, _1, _2));
-
 	return true;
 }
 
