@@ -1,62 +1,13 @@
 
-APP:=bin/http_server.so
+SERVER_PATH=server/bin
+SERVER_SHARE=http_server
 
-SRC_CC := $(wildcard ./*.cc)
-SRC := $(notdir $(SRC_CC:%.cc=%))
-OBJ := $(filter-out main.o,$(SRC:%=bin/%.o))
-
-CFLAGS := -Wall -O3 -std=c++17 -MMD -fPIC
-LDLIBS := -lstdc++ -pthread -shared -lc
-
-# Phony targets
-.PHONY: all clean debug env
-
-#
-# Bulid app
-#
-all: $(APP)
-	@make -C unittests
-	@make -C samples/basic		
-	@echo Done making $(APP)
-
-#
-# build
-#
-test:
-	make -C unittests debug	
+$(SERVER_PATH)/lib$(SERVER_SHARE).so:
+	@$(MAKE) -C server
 	
 #
-# Debug the app
-#
-debug: CFLAGS += -g3
-debug: all
-
-#
-# Compile
-#
-bin/%.o: src/%.cc
-	@mkdir -p bin/
-	@echo compiling $<
-	@$(CXX) -c $(CFLAGS) $(CPPFLAGS) -o $@ $< 
-
-#
-# Link
-#
-$(APP): $(OBJ)		
-	@echo linking $@
-	@$(CXX) -o $@ $(OBJ) $(LDFLAGS) $(LDLIBS)
-
-env:
-	@echo "SRC = $(SRC)"
-	@echo ""		
-	@echo "OBJ = $(OBJ)"
-#
-# Clean
-#
-clean:
-	@echo cleaning
-	@make -C unittests clean 
-	@rm -f bin/*
-	@rm -f $(APP)
-
--include $(OBJ:.o=.d)		
+# Bulid app
+# 
+all: $(SERVER_PATH)/lib$(SERVER_SHARE).so 
+	@$(MAKE) -C unittests
+	@$(MAKE) -C $(wildcard samples/*)

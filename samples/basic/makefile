@@ -8,7 +8,7 @@ SERVER_HEADERS=../../server/src
 SERVER_SHARE=http_server
 SERVER_PATH=../../server/bin
 
-CFLAGS := -Wall -g3 -std=c++17 -MMD -I../src -I$(SERVER_HEADERS)
+CFLAGS := -Wall -g3 -std=c++17 -MMD -I$(SERVER_HEADERS)
 
 LDLIBS :=  -lstdc++ -pthread      \
 					 -l$(SERVER_SHARE)      \
@@ -29,7 +29,7 @@ all: $(APP)
 #
 # Build server
 #
-$(SERVER_PATH)/$(SERVER_SHARE).so:
+$(SERVER_PATH)/lib$(SERVER_SHARE).so:
 	@$(MAKE) -C ../../server 	
 
 #

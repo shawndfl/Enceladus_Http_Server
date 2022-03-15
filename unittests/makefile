@@ -1,4 +1,5 @@
 
+
 APP:=bin/unit_tests
 
 SRC_CC := $(wildcard ../src/*.cc) $(wildcard ./*.cc)
@@ -10,8 +11,16 @@ SRC_CPP := $(notdir $(SRC_CPP:%.cpp=%))
 OBJ_CC := $(filter-out bin/main.o,$(SRC_CC:%=bin/%.o))
 OBJ_CPP := $(SRC_CPP:%=bin/%.o)
 
-CFLAGS := -Wall -g3 -std=c++17 -MMD -I../src
-LDLIBS := -lstdc++ -pthread
+SERVER_HEADERS=../server/src
+SERVER_SHARE=http_server
+SERVER_PATH=../server/bin
+
+CFLAGS := -Wall -g3 -std=c++17 -MMD -I$(SERVER_HEADERS)
+
+LDLIBS :=  -lstdc++ -pthread      \
+					 -l$(SERVER_SHARE)      \
+					 -L$(SERVER_PATH)       \
+					  -Wl,-rpath=$(SERVER_PATH)
 
 vpath %.cc ../src/
 vpath %.cc ./
@@ -19,13 +28,19 @@ vpath %.cpp ./UnitTest++/
 vpath %.cpp ./UnitTest++/Posix
 
 # Phony targets
-.PHONY: all clean debug env
+.PHONY: all clean debug
 
 #
 # Bulid app
 #
 all: $(APP)
 	@echo Done making $(APP)
+
+#
+# Build server
+#
+$(SERVER_PATH)/lib$(SERVER_SHARE).so:
+	@$(MAKE) -C ../server 	
 
 #
 # Compile
@@ -43,18 +58,10 @@ bin/%.o: %.cpp
 #
 # Link
 #
-$(APP): $(OBJ_CPP) $(OBJ_CC)		
+$(APP): $(SERVER_PATH)/$(SERVER_SHARE).so $(OBJ_CPP) $(OBJ_CC)	
 	@echo linking $@
 	@$(CXX) -o $@ $(OBJ_CPP) $(OBJ_CC) $(LDFLAGS) $(LDLIBS)
 
-env:
-	@echo "SRC_CC = $(SRC_CC)"
-	@echo ""		
-	@echo "SRC_CPP = $(SRC_CPP)"
-	@echo ""		
-	@echo "OBJ_CC = $(OBJ_CC)"
-	@echo ""		
-	@echo "OBJ_CPP = $(OBJ_CPP)"
 #
 # Clean
 #
@@ -63,4 +70,4 @@ clean:
 	@rm -f bin/*
 	@rm -f $(APP)
 
--include $(OBJ:.o=.d)		
+-include $(OBJ:.o=.d)
