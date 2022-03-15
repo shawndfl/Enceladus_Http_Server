@@ -47,7 +47,7 @@ bool HttpHandleWebSocket::Handler(HttpClientContext &client, const HttpServerCon
       std::string response;
 
       for (int i = 0; i < 10; i++) {
-         client.sendWebSocketFrame("tesing " + std::to_string(i));
+         client.sendWebSocketFrame("testing " + std::to_string(i));
          LOG("Sending " << i);
          client.readRaw(response);
          LOG("Response: " << response);

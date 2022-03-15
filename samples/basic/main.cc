@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 
    using namespace std::placeholders;
 
-   Config::load("../config/config.json");
+   Config::load("config/config.json");
    const Config& config = Config::get();
 
    HttpServer server;

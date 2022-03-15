@@ -1,30 +1,22 @@
 
-APP:=bin/http_server.so
+APP:=./bin/libhttp_server.so
 
-SRC_CC := $(wildcard ./*.cc)
+SRC_CC := $(wildcard ./src/*.cc)
 SRC := $(notdir $(SRC_CC:%.cc=%))
 OBJ := $(filter-out main.o,$(SRC:%=bin/%.o))
 
 CFLAGS := -Wall -O3 -std=c++17 -MMD -fPIC
-LDLIBS := -lstdc++ -pthread -shared -lc
+LDLIBS := -lstdc++ -pthread -shared -lc  
 
 # Phony targets
-.PHONY: all clean debug env
+.PHONY: all clean debug
 
 #
 # Bulid app
 #
-all: $(APP)
-	@make -C unittests
-	@make -C samples/basic		
+all: $(APP)			
 	@echo Done making $(APP)
 
-#
-# build
-#
-test:
-	make -C unittests debug	
-	
 #
 # Debug the app
 #
@@ -46,16 +38,11 @@ $(APP): $(OBJ)
 	@echo linking $@
 	@$(CXX) -o $@ $(OBJ) $(LDFLAGS) $(LDLIBS)
 
-env:
-	@echo "SRC = $(SRC)"
-	@echo ""		
-	@echo "OBJ = $(OBJ)"
 #
 # Clean
 #
 clean:
-	@echo cleaning
-	@make -C unittests clean 
+	@echo cleaning	
 	@rm -f bin/*
 	@rm -f $(APP)
 

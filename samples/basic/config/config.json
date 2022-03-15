@@ -22,6 +22,6 @@
    #
    # The path to the content folder
    #
-   "content": "../http/content"
+   "content": "http/content"
    
 }

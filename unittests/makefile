@@ -10,7 +10,7 @@ SRC_CPP := $(notdir $(SRC_CPP:%.cpp=%))
 OBJ_CC := $(filter-out bin/main.o,$(SRC_CC:%=bin/%.o))
 OBJ_CPP := $(SRC_CPP:%=bin/%.o)
 
-CFLAGS := -Wall -O3 -std=c++17 -MMD -I../src
+CFLAGS := -Wall -g3 -std=c++17 -MMD -I../src
 LDLIBS := -lstdc++ -pthread
 
 vpath %.cc ../src/
@@ -26,12 +26,6 @@ vpath %.cpp ./UnitTest++/Posix
 #
 all: $(APP)
 	@echo Done making $(APP)
-
-#
-# Debug the app
-#
-debug: CFLAGS += -g3
-debug: all
 
 #
 # Compile
