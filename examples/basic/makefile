@@ -24,6 +24,7 @@ vpath %.cc ./
 # Bulid app
 #
 all: $(APP)
+	@$(MAKE) -C ../../server
 	@echo Done making $(APP)
 
 #

@@ -50,14 +50,14 @@ bool HttpHandleWebSocket::Handler(HttpClientContext &client, const HttpServerCon
 
       for (int i = 0; i < 10; i++) {
          client.sendWebSocketFrame("testing " + std::to_string(i));
-         LOG("Sending " << i);
+         LOGD("Sending " << i);
          client.readRaw(response);
-         LOG("Response: " << response);
+         LOGD("Response: " << response);
          std::this_thread::sleep_for(std::chrono::seconds(1));
       }
 
 
-      LOG("Found web SOCKET!!");
+      LOGD("Found web SOCKET!!");
       return true;
    } else {
       return false;

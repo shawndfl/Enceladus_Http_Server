@@ -50,9 +50,9 @@ int HttpClientContext::getSocketfd() const {
 void HttpClientContext::sendRaw(const char *data, size_t size) {
    size_t bytesSent = write(socketfd_, data, size);
    if(bytesSent == (unsigned) -1) {
-      LOG("Error sending: " << strerror(errno));
+      LOGD("Error sending: " << strerror(errno));
    } else {
-      LOG("sent: " << data << " => " << bytesSent << " bytes");
+      LOGD("sent: " << data << " => " << bytesSent << " bytes");
    }
 }
 
@@ -110,7 +110,7 @@ void HttpClientContext::sendWebSocketFrame(const std::string &data) {
    }
 
    if(size > 0xFFFFFFFF){
-      LOG("Error packet too big it must be split into multiple frames");
+      LOGD("Error packet too big it must be split into multiple frames");
    }
 
    frame.maskAndlength  = (noMask << 7)  |  (length & 0x7F);
@@ -131,7 +131,7 @@ bool HttpClientContext::readRaw(std::string &data) {
 
       if (bytesSent == (unsigned) -1) {
          if (errno != EAGAIN) {
-            LOG("Error sending: " << strerror(errno));
+            LOGD("Error sending: " << strerror(errno));
          } else {
             return false;
          }

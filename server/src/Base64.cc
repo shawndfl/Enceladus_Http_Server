@@ -113,7 +113,7 @@ bool Base64::decode(const std::string &encoded, std::vector<char>& decoded) {
 
    // check size
    if(encodedSize%4 != 0) {
-      LOG("Invalid base64 string " << encoded);
+      LOGD("Invalid base64 string " << encoded);
       return false;
    }
 
@@ -123,19 +123,19 @@ bool Base64::decode(const std::string &encoded, std::vector<char>& decoded) {
    for (size_t i = 0; i < encodedSize; i += 4) {
 
       if (!isValidCharacter(encoded[i])) {
-         LOG("Invalid base64 char at " << i << ": " << encoded);
+         LOGD("Invalid base64 char at " << i << ": " << encoded);
          return false;
       }
       if (!isValidCharacter(encoded[i+1])) {
-         LOG("Invalid base64 char at " << i+1 << ": " << encoded);
+         LOGD("Invalid base64 char at " << i+1 << ": " << encoded);
          return false;
       }
       if (!isValidCharacter(encoded[i+2])) {
-         LOG("Invalid base64 char at " << i+2 << ": " << encoded);
+         LOGD("Invalid base64 char at " << i+2 << ": " << encoded);
          return false;
       }
       if (!isValidCharacter(encoded[i+3])) {
-         LOG("Invalid base64 char at " << i+3 << ": " << encoded);
+         LOGD("Invalid base64 char at " << i+3 << ": " << encoded);
          return false;
       }
 
@@ -168,7 +168,7 @@ bool Base64::decode(const std::string &encoded, std::vector<char>& decoded) {
 
    // check to be sure the encoded string does not have more than two "=="
    if(paddingCount > 2) {
-      LOG("Invalid base64 string. Too much padding " << encoded);
+      LOGD("Invalid base64 string. Too much padding " << encoded);
       return false;
    }
 

@@ -82,7 +82,7 @@ const JsonNode& JsonParser::parseFile(const std::string& file) {
          setError("expected object or array");
       }
    } else {
-      LOG("Cannot open file " << file);
+      LOGD("Cannot open file " << file);
    }
 
    return node_;

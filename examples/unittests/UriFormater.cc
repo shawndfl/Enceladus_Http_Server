@@ -24,7 +24,7 @@ TEST(sha1) {
    std::stringstream debug;
 
    size_t count =  sizeof(dig);
-   LOG("count " << count);
+   LOGD("count " << count);
    for(size_t i = 0; i < count; i++) {
       debug << " 0x" << std::setw(2) << std::setfill('0') << std::hex << (unsigned )(dig[i]);
    }

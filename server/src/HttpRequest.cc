@@ -14,7 +14,7 @@ HttpRequest::HttpRequest() :
 
 /*************************************************/
 std::string HttpRequest::getHeader(const std::string& header) const {
-   for(int i =0; i < headers.size(); i++) {
+   for(size_t i = 0; i < headers.size(); i++) {
       if(headers[i].first == header) {
          return headers[i].second;
       }
@@ -113,7 +113,7 @@ bool HttpRequest::ParseRequestLine(const std::string& line) {
                unsigned char hexChar = (unsigned char) strtol(hex, NULL, 16);
 
                if (hexChar < 0x1F || hexChar > 0x7E) {
-                  LOGE("Hex value out of range: value=%d Range is 32 to 126", (unsigned char)hexChar);
+                  LOGE("Hex value out of range: value=" << (unsigned char)hexChar << " Range is 32 to 126");
                } else {
                   value += hexChar;
                }
@@ -216,7 +216,7 @@ void HttpRequest::parseLines(std::vector<std::string>& lines) {
       } else {
          ParseHeaderLine(line);
       }
-      LOG(line.substr(0, line.size()-2));
+      LOGD(line.substr(0, line.size()-2));
    }
 }
 

@@ -49,8 +49,8 @@ TEST(DeepObjects) {
    ehs::JsonNode& array2 = object2["item4"];
    array2[3] = 9;
 
-   //LOG(object.toString());
-   //LOG("\n" << object.toString(true));
+   //LOGD(object.toString());
+   //LOGD("\n" << object.toString(true));
 
 }
 

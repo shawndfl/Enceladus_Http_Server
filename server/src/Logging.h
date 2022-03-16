@@ -32,34 +32,28 @@ private:
 };
 }
 
-#define LOG( STREAM ) do {                               \
+#define LOGD(STREAM) do { \
       std::stringstream LoggingString;                   \
       LoggingString << STREAM;              \
       ehs::Logging::logit('d', __FILE__, __LINE__, LoggingString.str() );  \
 } while(0)
 
-#define LOGD(FORMAT, ...) do { \
-		char TIMESTAMP[20] = {0}; \
-		ehs::Logging::timestamp(TIMESTAMP, 20); \
-		printf ("D (%s:%d)[%s] " FORMAT "\n" , __FILE__, __LINE__, TIMESTAMP,  ##__VA_ARGS__ ); \
+#define LOGI(STREAM) do { \
+      std::stringstream LoggingString;                   \
+      LoggingString << STREAM;              \
+      ehs::Logging::logit('i', __FILE__, __LINE__, LoggingString.str() );  \
 } while(0)
 
-#define LOGI(FORMAT, ...) do { \
-      char TIMESTAMP[20] = {0}; \
-      ehs::Logging::timestamp(TIMESTAMP, 20); \
-      printf ("I (%s:%d)[%s] " FORMAT "\n" , __FILE__, __LINE__, TIMESTAMP,  ##__VA_ARGS__ ); \
+#define LOGW(STREAM) do { \
+      std::stringstream LoggingString;                   \
+      LoggingString << STREAM;              \
+      ehs::Logging::logit('w', __FILE__, __LINE__, LoggingString.str() );  \
 } while(0)
 
-#define LOGW(FORMAT, ...) do { \
-      char TIMESTAMP[20] = {0}; \
-      ehs::Logging::timestamp(TIMESTAMP, 20); \
-      printf ("W (%s:%d)[%s] " FORMAT "\n" , __FILE__, __LINE__, TIMESTAMP,  ##__VA_ARGS__ ); \
-} while(0)
-
-#define LOGE(FORMAT, ...) do { \
-      char TIMESTAMP[20] = {0}; \
-      ehs::Logging::timestamp(TIMESTAMP, 20); \
-      printf ("E (%s:%d)[%s] " FORMAT "\n" , __FILE__, __LINE__, TIMESTAMP,  ##__VA_ARGS__ ); \
+#define LOGE(STREAM) do { \
+      std::stringstream LoggingString;                   \
+      LoggingString << STREAM;              \
+      ehs::Logging::logit('e', __FILE__, __LINE__, LoggingString.str() );  \
 } while(0)
 
 

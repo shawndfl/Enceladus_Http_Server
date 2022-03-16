@@ -40,20 +40,20 @@ std::string RequestFormater::getResourcePath(const std::string &root, const std:
 
 	// get the real root
 	if(realpath(root.c_str(), rootPath) == NULL) {
-		LOG("Error: getting root path " << root);
+		LOGD("Error: getting root path " << root);
 		return "";
 	}
 
 	// put together a temp path to make sure it is in the root path
 	std::string tmpPath = std::string(rootPath) + location;
 	if(realpath(tmpPath.c_str(), path) == NULL) {
-		LOG("Warning: location does not exist " << tmpPath);
+		LOGD("Warning: location does not exist " << tmpPath);
 		return "";
 	}
 
 	// make sure the path has the root in it.
 	if(strncmp(path, rootPath, strlen(rootPath)) != 0) {
-		LOG("Error: " << path << " is outside of root " << rootPath);
+		LOGD("Error: " << path << " is outside of root " << rootPath);
 		return "";
 	}
 

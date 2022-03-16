@@ -34,13 +34,14 @@ vpath %.cpp ./UnitTest++/Posix
 # Bulid app
 #
 all: $(APP)
+	@$(MAKE) -C ../../server
 	@echo Done making $(APP)
 
 #
 # Build server
 #
 $(SERVER_PATH)/lib$(SERVER_SHARE).so:
-	@$(MAKE) -C ../server 	
+	@$(MAKE) -C ../../server 	
 
 #
 # Compile

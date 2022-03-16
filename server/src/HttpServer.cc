@@ -42,7 +42,7 @@ bool HttpServer::StartServer(uint port, uint threadCount) {
 	// Creating socket file descriptor
 	int fd;
 	if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
-		LOGE("socket error: %d", errno);
+		LOGE("socket error: " << errno);
 		return false;
 	}
 	serverContext_.setPort(port);
@@ -52,13 +52,13 @@ bool HttpServer::StartServer(uint port, uint threadCount) {
 	int opt = 1;
 	if (setsockopt(serverContext_.getSocketfd(), SOL_SOCKET,
 	SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
-		LOGE("setsockopt error: %d", errno);
+		LOGE("setsockopt error: " << errno);
 		return false;
 	}
 
 	if (setsockopt(serverContext_.getSocketfd(), SOL_SOCKET,
 	SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
-		LOGE("setsockopt error: %d", errno);
+		LOGE("setsockopt error: " << errno);
 		return false;
 	}
 
@@ -71,16 +71,16 @@ bool HttpServer::StartServer(uint port, uint threadCount) {
 	// socket to the port
 	if (bind(serverContext_.getSocketfd(), (struct sockaddr*) &address,
 			sizeof(address)) < 0) {
-		LOGE("Error binding to port %d", serverContext_.getPort());
+		LOGE("Error binding to port " << serverContext_.getPort());
 		return false;
 	}
 
 	if (listen(serverContext_.getSocketfd(), BACKLOG) < 0) {
-		LOGE("Error listen %d %d", serverContext_.getSocketfd(), errno);
+		LOGE("Error listen " << serverContext_.getSocketfd() << " " << errno);
 		return false;
 	}
 
-	LOGI("Listening on port %d", serverContext_.getPort());
+	LOGI("Listening on port " << serverContext_.getPort());
 
 	acceptThread_ = std::thread(&HttpServer::acceptHandler, this);
 
@@ -122,12 +122,12 @@ void HttpServer::acceptHandler() {
       socklen_t addrLen = sizeof(clientAddr);
       int clientfd = accept(serverContext_.getSocketfd(), &clientAddr, &addrLen);
       if (clientfd < 0) {
-         LOGE("Error accept %d %d", clientfd, errno);
+         LOGE("Error accept " << clientfd << " " << errno);
          break;
       }
 
       //TODO add ip address of client
-      LOGI("Got a client %d", clientfd);
+      LOGI("Got a client " << clientfd);
 
       // create the client context
       std::shared_ptr<HttpClientContext> context
@@ -168,7 +168,7 @@ size_t writen(int fd, const void *buffer, size_t size) {
 			if (bytesWrote == (size_t) -1 && errno == EINTR) {
 				continue;
 			} else {
-				LOGE("Error writing %d ", errno);
+				LOGE("Error writing " << errno);
 				return -1;
 			}
 		}
@@ -196,7 +196,7 @@ bool readRequest(HttpClientContext &context) {
 			if (errno == EINTR) {
 				continue;
 			} else {
-				LOGE("Error reading %d ", errno);
+				LOGE("Error reading " << errno);
 				return false;
 			}
 		}
@@ -265,11 +265,11 @@ void HttpServer::requestHandler(const HttpServerContext& context) {
          }
       }
 
-      LOG("Reading request on: " << std::this_thread::get_id());
+      LOGD("Reading request on: " << std::this_thread::get_id());
 
       // Read the request
       if (!readRequest(*context)) {
-         LOG("Error reading request from " << context->getSocketfd());
+         LOGD("Error reading request from " << context->getSocketfd());
          break;
       }
 
@@ -296,6 +296,6 @@ void HttpServer::requestHandler(const HttpServerContext& context) {
       }
    }
 
-	LOG("Exiting thread " << std::this_thread::get_id());
+	LOGD("Exiting thread " << std::this_thread::get_id());
 }
 }

@@ -110,7 +110,7 @@ std::string HttpResponse::getStatusCodeAndReason() const {
    case CODE505:
       return "505 HTTP Version Not Supported";
    default:
-      LOGE("Unknown return code: %d ", statusCode);
+      LOGE("Unknown return code: " << statusCode);
       return "500 Internal Server Error";
    }
 }
