@@ -1,14 +1,12 @@
 #include "UnitTest++/UnitTest++.h"
-#include "Logging.h"
-#include "JsonNode.h"
-#include "JsonParser.h"
+#include "Enceladus.h"
 
 SUITE(Json) {
 
 /*************************************************/
 TEST(ToString) {
-   JsonNode node;
-   JsonNode value;
+   ehs::JsonNode node;
+   ehs::JsonNode value;
    value.setNumber(12);
    node.setObject("test", value);
    CHECK_EQUAL("{\"test\":12.000000}", node.toString());
@@ -17,7 +15,7 @@ TEST(ToString) {
 
 /*************************************************/
 TEST(Array) {
-   JsonNode node;
+   ehs::JsonNode node;
    node.append() = 12;
    node.append() = 13;
    CHECK_EQUAL("[12.000000,13.000000]", node.toString());
@@ -26,9 +24,9 @@ TEST(Array) {
 
 /*************************************************/
 TEST(DeepObjects) {
-   JsonNode object;
+   ehs::JsonNode object;
 
-   JsonNode& array = object["array"];
+   ehs::JsonNode& array = object["array"];
    array.append() = "testing1";
    array.append() = "testing2";
    array.append() = "testing3";
@@ -43,12 +41,12 @@ TEST(DeepObjects) {
 
    object["null"].setNull();
 
-   JsonNode& object2 = object["sub_object"];
+   ehs::JsonNode& object2 = object["sub_object"];
    object2["item1"] = 45;
    object2["item2"] = "testing";
    object2["item3"] = "testing";
 
-   JsonNode& array2 = object2["item4"];
+   ehs::JsonNode& array2 = object2["item4"];
    array2[3] = 9;
 
    //LOG(object.toString());
@@ -57,9 +55,9 @@ TEST(DeepObjects) {
 }
 
 TEST(ParseCompare) {
-   JsonNode object;
+   ehs::JsonNode object;
 
-   JsonNode& array = object["array"];
+   ehs::JsonNode& array = object["array"];
    array.append() = "testing1";
    array.append() = "testing2";
    array.append() = "testing3";
@@ -74,16 +72,16 @@ TEST(ParseCompare) {
 
    object["null"].setNull();
 
-   JsonNode& object2 = object["sub_object"];
+   ehs::JsonNode& object2 = object["sub_object"];
    object2["item1"] = 45;
    object2["item2"] = "testing";
    object2["item3"] = "testing";
 
-   JsonNode& array2 = object2["item4"];
+   ehs::JsonNode& array2 = object2["item4"];
    array2[3] = 9;
 
-   JsonParser parser;
-   JsonNode data = parser.parse(object.toString(true));
+   ehs::JsonParser parser;
+   ehs::JsonNode data = parser.parse(object.toString(true));
 
    CHECK_EQUAL(object.toString(), data.toString());
 
@@ -91,8 +89,8 @@ TEST(ParseCompare) {
 
 
 TEST(Parse) {
-   JsonParser parser;
-   JsonNode data = parser.parse("{}");
+   ehs::JsonParser parser;
+   ehs::JsonNode data = parser.parse("{}");
 
    CHECK_EQUAL("{}", data.toString(true));
 
@@ -105,9 +103,9 @@ TEST(Parse) {
 
 
 TEST(ParseError) {
-   JsonParser parser;
+   ehs::JsonParser parser;
 
-   JsonNode data = parser.parse("{\n \"key\":2,\n\"key2\"\n  : 7,  }");
+   ehs::JsonNode data = parser.parse("{\n \"key\":2,\n\"key2\"\n  : 7,  }");
 
    CHECK_EQUAL(true, parser.hasError());
 
@@ -115,9 +113,9 @@ TEST(ParseError) {
 }
 
 TEST(ParseErrorAssigment) {
-   JsonParser parser;
+   ehs::JsonParser parser;
 
-   JsonNode data = parser.parse("{\n \"key\" 2,\n\"key2\"\n  : 7,  }");
+   ehs::JsonNode data = parser.parse("{\n \"key\" 2,\n\"key2\"\n  : 7,  }");
 
    CHECK_EQUAL(true, parser.hasError());
 

@@ -11,6 +11,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+namespace ehs {
+
 /*************************************************/
 HttpFileSystem::HttpFileSystem() {
 
@@ -54,13 +56,5 @@ bool HttpFileSystem::exists(const std::string& filename) {
       }
    }
    return false;
-/*
-   if (FILE *file = fopen(filename.c_str(), "r")) {
-      if( S_IFDIR(
-      fclose(file);
-      return true;
-   } else {
-      return false;
-   }
-   */
+}
 }

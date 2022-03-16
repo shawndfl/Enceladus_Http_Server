@@ -14,6 +14,8 @@
 #include "HttpHandleFile.h"
 #include "HttpHandleWebSocket.h"
 
+namespace ehs {
+
 #define BACKLOG 50
 
 bool readRequest(HttpClientContext &context);
@@ -295,4 +297,5 @@ void HttpServer::requestHandler(const HttpServerContext& context) {
    }
 
 	LOG("Exiting thread " << std::this_thread::get_id());
+}
 }

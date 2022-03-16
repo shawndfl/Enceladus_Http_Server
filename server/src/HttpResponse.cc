@@ -1,6 +1,9 @@
 
 #include "HttpResponse.h"
 #include "Logging.h"
+
+namespace ehs {
+
 /*************************************************/
 HttpResponse::HttpResponse() {
    statusCode = CODE500;
@@ -110,4 +113,5 @@ std::string HttpResponse::getStatusCodeAndReason() const {
       LOGE("Unknown return code: %d ", statusCode);
       return "500 Internal Server Error";
    }
+}
 }

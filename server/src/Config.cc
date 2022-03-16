@@ -8,6 +8,7 @@
 #include "Config.h"
 #include "JsonParser.h"
 
+namespace ehs {
 Config Config::config_;
 
 /*************************************************/
@@ -42,4 +43,4 @@ const Config& Config::get() {
    return config_;
 }
 
-
+}

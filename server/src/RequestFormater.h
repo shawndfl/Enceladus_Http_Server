@@ -10,6 +10,8 @@
 
 #include <string>
 
+namespace ehs {
+
 /**
  * Gets a real path from a root path on the host and a location path from the URI
  */
@@ -39,5 +41,5 @@ private:
 
 	std::string defaultLocation_;		/// The default location when none is provide
 };
-
+}
 #endif /* SRC_REQUESTFORMATER_H_ */

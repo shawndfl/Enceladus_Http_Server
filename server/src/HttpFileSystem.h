@@ -9,6 +9,7 @@
 #define SRC_HTTPFILESYSTEM_H_
 
 #include <string>
+namespace ehs {
 
 class HttpFileSystem {
 public:
@@ -22,5 +23,5 @@ public:
    static std::string toLower(const std::string& text);
 
 };
-
+}
 #endif /* SRC_HTTPFILESYSTEM_H_ */

@@ -11,6 +11,7 @@
 #include "Config.h"
 #include <fstream>
 
+namespace ehs {
 /*************************************************/
 HttpHandleFile::HttpHandleFile() {
 }
@@ -69,4 +70,5 @@ bool HttpHandleFile::Handler(HttpClientContext& client, const HttpServerContext&
    }
 
    return handled;
+}
 }

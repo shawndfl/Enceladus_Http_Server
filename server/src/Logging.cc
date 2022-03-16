@@ -9,6 +9,8 @@
 #include <iostream>
 #include <iomanip>
 
+namespace ehs {
+
 /*************************************************/
 Logging::Logging() {
 }
@@ -60,4 +62,4 @@ void Logging::logit(const char logType,
          << text
          <<  std::endl;
 }
-
+}

@@ -40,6 +40,7 @@
 
 #include "sha1.h"
 
+namespace ehs {
 /*  
  *  SHA1
  *
@@ -591,4 +592,5 @@ void SHA1::PadMessage()
 unsigned SHA1::CircularShift(int bits, unsigned word)
 {
     return ((word << bits) & 0xFFFFFFFF) | ((word & 0xFFFFFFFF) >> (32-bits));
+}
 }

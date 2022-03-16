@@ -5,6 +5,8 @@
 #include "HttpServerContext.h"
 #include "HttpClientContext.h"
 
+namespace ehs {
+
 class HttpServer;
 
 /**
@@ -34,5 +36,6 @@ private:
    HttpServer& server_;
 
 };
+}
 
 #endif /* SRC_HTTPSERVERCONTEXT_H_ */

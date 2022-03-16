@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 
+namespace ehs {
 HttpClientContext::HttpClientContext(int clientfd) :
       socketfd_(clientfd) {
 
@@ -147,3 +148,5 @@ bool HttpClientContext::readRaw(std::string &data) {
 void HttpClientContext::close(const std::string &data) {
    ::close(socketfd_);
 }
+}
+

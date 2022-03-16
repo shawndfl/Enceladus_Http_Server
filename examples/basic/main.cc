@@ -1,11 +1,9 @@
 #ifndef UNIT_TEST
 
 #include <iostream>
-#include "Logging.h"
-#include "HttpServer.h"
-#include "Config.h"
+#include "Enceladus.h"
 
-bool Handler(HttpClientContext& client, const HttpServerContext& server) {
+bool Handler(ehs::HttpClientContext& client, const ehs::HttpServerContext& server) {
 
    LOGI("uri: %s", client.request.getUri().c_str());
    LOGI("uriPath: %s", client.request.getUriPath().c_str());
@@ -14,14 +12,14 @@ bool Handler(HttpClientContext& client, const HttpServerContext& server) {
    std::string body = "<html><head><title>Testing</title></head><body> <b> Hello!!</b><br>";
 
    for (size_t i = 0; i < client.request.getQueryParameters().size(); i++) {
-      Pair pair = client.request.getQueryParameters().at(i);
+      ehs::Pair pair = client.request.getQueryParameters().at(i);
 
       body += pair.first + " = " + pair.second + "<br>";
    }
 
    body += "</body></html>";
 
-   client.response.statusCode = HttpResponse::CODE200;
+   client.response.statusCode = ehs::HttpResponse::CODE200;
 
    client.response.appendHeader("Content-Type", "text/html; charset=ISO-8859-1");
    client.response.body = body;
@@ -35,19 +33,19 @@ int main(int argc, char *argv[]) {
 
    using namespace std::placeholders;
 
-   Config::load("config/config.json");
-   const Config& config = Config::get();
+   ehs::Config::load("config/config.json");
+   const ehs::Config& config = ehs::Config::get();
 
-   HttpServer server;
+   ehs::HttpServer server;
    server.StartServer(config.listeningPort, config.threads);
 
    using namespace std::placeholders;
 
    // setup default handlers
-   HttpHandleFile httpFiles;
-   HttpHandleWebSocket websockets;
-   addRequestHandler(std::bind(&HttpHandleFile::Handler, httpFiles, _1, _2));
-   addRequestHandler(std::bind(&HttpHandleWebSocket::Handler, websockets, _1, _2));
+   ehs::HttpHandleFile httpFiles;
+   //ehs::HttpHandleWebSocket websockets;
+   server.addRequestHandler(std::bind(&ehs::HttpHandleFile::Handler, httpFiles, _1, _2));
+   //addRequestHandler(std::bind(&ehs::HttpHandleWebSocket::Handler, websockets, _1, _2));
 
    server.addRequestHandler(&Handler);
 

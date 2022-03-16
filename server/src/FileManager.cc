@@ -8,6 +8,8 @@
 #include "FileManager.h"
 #include <fstream>
 
+namespace ehs {
+
 /*************************************************/
 FileManager::FileManager() {
 
@@ -36,4 +38,5 @@ bool FileManager::loadFile(const std::string path) {
 /*************************************************/
 const std::string& FileManager::getContent() const {
    return content_;
+}
 }

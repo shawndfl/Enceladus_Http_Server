@@ -10,6 +10,8 @@
 
 #include "JsonNode.h"
 
+namespace ehs {
+
 class JsonParser {
 public:
    JsonParser();
@@ -75,5 +77,5 @@ private:
    JsonNode    node_;      /// Root node
    std::string file_;      /// Json filename
 };
-
+}
 #endif /* SRC_JSONPARSER_H_ */

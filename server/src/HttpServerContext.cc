@@ -1,6 +1,8 @@
 
 #include "HttpServerContext.h"
 
+namespace ehs {
+
 /*************************************************/
 HttpServerContext::HttpServerContext(HttpServer& server) :
    port_(0),
@@ -34,4 +36,4 @@ void HttpServerContext::setSocketfd(int socketfd) {
    socketfd_ = socketfd;
 }
 
-/*************************************************/
+}

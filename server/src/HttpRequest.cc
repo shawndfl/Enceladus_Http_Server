@@ -4,7 +4,9 @@
 #include <locale>         // std::locale, std::tolower
 #include <algorithm>
 
- /*************************************************/
+namespace ehs {
+
+/*************************************************/
 HttpRequest::HttpRequest() :
       parseErrorCode(0), parsedState(HttpRequest::NewRequest) {
 
@@ -271,4 +273,5 @@ int HttpRequest::getParseErrorCode() const {
 /*************************************************/
 const std::string& HttpRequest::getUri() const {
    return uri;
+}
 }

@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+namespace ehs {
+
 /**
  * This class will encode and decode base 64 string
  */
@@ -30,4 +32,5 @@ public:
    static  bool decode(const std::string& encoded,  std::vector<char>& decoded);
 };
 
+}
 #endif /* SRC_BASE64_H_ */

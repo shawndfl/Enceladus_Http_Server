@@ -7,6 +7,8 @@
 
 #include "JsonNode.h"
 
+namespace ehs {
+
 /*************************************************/
 JsonNode::JsonNode() {
    type_ = JsonNull;
@@ -307,4 +309,4 @@ void JsonNode::toStringImpl(std::string& json) const {
       break;
    }
 }
-
+}

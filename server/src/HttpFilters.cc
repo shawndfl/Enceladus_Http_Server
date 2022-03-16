@@ -7,6 +7,7 @@
 
 #include "HttpFilters.h"
 
+namespace ehs {
 HttpFilters::HttpFilters() {
    // TODO Auto-generated constructor stub
 
@@ -15,4 +16,4 @@ HttpFilters::HttpFilters() {
 HttpFilters::~HttpFilters() {
    // TODO Auto-generated destructor stub
 }
-
+}

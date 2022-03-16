@@ -10,6 +10,7 @@
 
 #include <string>
 
+namespace ehs {
 /**
  * This class reads a json config
  */
@@ -35,5 +36,5 @@ private:
 	static Config config_;
 
 };
-
+}
 #endif /* SRC_CONFIG_H_ */

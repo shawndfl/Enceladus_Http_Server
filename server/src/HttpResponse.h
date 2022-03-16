@@ -6,6 +6,8 @@
 #include <vector>
 #include "HttpConst.h"
 
+namespace ehs {
+
 /**
  * This structure can handle a response.
  * see https://tools.ietf.org/html/rfc7230#section-3.1.2
@@ -112,4 +114,5 @@ public:
 
 };
 
+}
 #endif /* SRC_HTTPRESPONSE_H_ */

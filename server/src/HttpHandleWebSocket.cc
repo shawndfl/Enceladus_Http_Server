@@ -11,6 +11,8 @@
 #include "sha1.h"
 #include <thread>
 
+namespace ehs {
+
 const char* WebSocketGUID="258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
 HttpHandleWebSocket::HttpHandleWebSocket() {
@@ -60,4 +62,5 @@ bool HttpHandleWebSocket::Handler(HttpClientContext &client, const HttpServerCon
    } else {
       return false;
    }
+}
 }

@@ -12,6 +12,8 @@
 #include <vector>
 #include <string>
 
+namespace ehs {
+
 class JsonNode {
 public:
    enum Type{
@@ -108,5 +110,7 @@ private:
    std::map<std::string, JsonNode>  valueObj_;
 
 };
+
+}
 
 #endif /* SRC_JSONNODE_H_ */

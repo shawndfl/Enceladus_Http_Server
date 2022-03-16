@@ -5,6 +5,8 @@
 #include "HttpResponse.h"
 #include "HttpConst.h"
 
+namespace ehs {
+
 /**
  * The context of the client connect.
  * The user should fill out the response structure
@@ -66,5 +68,5 @@ private:
    int socketfd_;
 
 };
-
+}
 #endif /* SRC_HTTPCLIENTCONTEXT_H_ */

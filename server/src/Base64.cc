@@ -9,6 +9,7 @@
 #include "Logging.h"
 #include <bitset>
 
+namespace ehs {
 const char* Encoding = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz"
       "0123456789+/";
@@ -172,4 +173,5 @@ bool Base64::decode(const std::string &encoded, std::vector<char>& decoded) {
    }
 
    return true;
+}
 }

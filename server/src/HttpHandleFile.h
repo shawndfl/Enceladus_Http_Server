@@ -11,6 +11,7 @@
 #include "HttpClientContext.h"
 #include "HttpServerContext.h"
 
+namespace ehs {
 class HttpHandleFile {
 public:
    HttpHandleFile();
@@ -18,5 +19,5 @@ public:
 
    bool Handler(HttpClientContext& client, const HttpServerContext& server);
 };
-
+}
 #endif /* SRC_HTTPHANDLEFILE_H_ */

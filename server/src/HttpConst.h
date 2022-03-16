@@ -4,6 +4,8 @@
 
 #include <functional>
 
+namespace ehs {
+
 class HttpClientContext;
 class HttpServerContext;
 
@@ -19,6 +21,5 @@ typedef std::pair<std::string,std::string> Pair;
  */
 typedef std::function<bool(HttpClientContext&, const HttpServerContext&)> HttpRequestHandler;
 
-
-
+}
 #endif /* SRC_HTTPCONST_H_ */

@@ -10,6 +10,7 @@
 
 #include <string>
 
+namespace ehs {
 /**
  * This class is used to load a file into memory
  */
@@ -25,5 +26,5 @@ public:
 private:
    std::string content_;
 };
-
+}
 #endif /* SRC_FILEMANAGER_H_ */

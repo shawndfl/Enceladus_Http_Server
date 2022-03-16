@@ -10,6 +10,8 @@
 #include "RequestFormater.h"
 #include "Logging.h"
 
+namespace ehs {
+
 /*************************************************/
 RequestFormater::RequestFormater() {
 	defaultLocation_ = "/index.html";
@@ -66,4 +68,5 @@ const std::string& RequestFormater::getDefaultLocation() const {
 /*************************************************/
 void RequestFormater::setDefaultLocation(const std::string &defaultLocation) {
 	defaultLocation_ = defaultLocation;
+}
 }

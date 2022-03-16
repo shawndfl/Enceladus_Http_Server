@@ -10,6 +10,8 @@
 #include <fstream>
 #include "Logging.h"
 
+namespace ehs {
+
 constexpr const char* whiteSpace = "\r\n\t ";
 constexpr const char  startArray = '[';
 constexpr const char  endArray = ']';
@@ -360,4 +362,5 @@ bool JsonParser::parseNumber(const std::string& token, double& value) const {
    } catch(std::exception& ex) {
       return false;
    }
+}
 }

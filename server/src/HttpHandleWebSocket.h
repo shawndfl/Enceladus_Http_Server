@@ -11,6 +11,8 @@
 #include "HttpClientContext.h"
 #include "HttpServerContext.h"
 
+namespace ehs {
+
 /**
  * This class will handle a web socket connection
  */
@@ -38,5 +40,6 @@ protected:
 
    virtual void close() = 0;
 };
+}
 
 #endif /* SRC_HTTPHANDLEWEBSOCKET_H_ */

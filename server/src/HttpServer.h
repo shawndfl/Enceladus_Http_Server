@@ -16,6 +16,8 @@
 #include "HttpResponse.h"
 #include "HttpConst.h"
 
+namespace ehs {
+
 /**
  * The main server class used to start the server
  */
@@ -87,5 +89,6 @@ private:
    std::condition_variable          clientConnectCondition_;
 
 };
+}
 
 #endif /* SRC_HttpServer_H_ */

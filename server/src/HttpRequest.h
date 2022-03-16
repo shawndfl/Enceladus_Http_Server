@@ -5,6 +5,7 @@
 #include <vector>
 #include "HttpConst.h"
 
+namespace ehs {
 /**
  * The request from the client.
  *  See https://tools.ietf.org/html/rfc7230#section-3.1.1
@@ -167,5 +168,6 @@ private:
    std::string body;
 
 };
+}
 
 #endif /* SRC_HTTPREQUEST_H_ */
