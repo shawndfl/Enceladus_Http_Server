@@ -1,19 +1,19 @@
 
 
-APP:=bin/unit_tests
+APP:=../../bin/unit_tests
 
-SRC_CC := $(wildcard ../src/*.cc) $(wildcard ./*.cc)
+SRC_CC := $(wildcard ./*.cc)
 SRC_CPP := $(wildcard ./UnitTest++/*.cpp) $(wildcard ./UnitTest++/Posix/*.cpp)
 
 SRC_CC := $(notdir $(SRC_CC:%.cc=%))
 SRC_CPP := $(notdir $(SRC_CPP:%.cpp=%))
 
-OBJ_CC := $(filter-out bin/main.o,$(SRC_CC:%=bin/%.o))
-OBJ_CPP := $(SRC_CPP:%=bin/%.o)
+OBJ_CC := $(filter-out bin/main.o,$(SRC_CC:%=../../obj/%.o))
+OBJ_CPP := $(SRC_CPP:%=../../obj/%.o)
 
 SERVER_HEADERS=../../server/src
 SERVER_SHARE=http_server
-SERVER_PATH=../../server/bin
+SERVER_PATH=../../lib
 
 CFLAGS := -Wall -g3 -std=c++17 -MMD -I$(SERVER_HEADERS)
 
@@ -46,20 +46,21 @@ $(SERVER_PATH)/lib$(SERVER_SHARE).so:
 #
 # Compile
 #
-bin/%.o: %.cc
-	@mkdir -p bin/
+../../obj/%.o: %.cc
+	@mkdir -p ../../obj/
 	@echo compiling $<
 	@$(CXX) -c $(CFLAGS) $(CPPFLAGS) -o $@ $< 
 
-bin/%.o: %.cpp
-	@mkdir -p bin/
+../../obj/%.o: %.cpp
+	@mkdir -p ../../obj/
 	@echo compiling $<
 	@$(CXX) -c $(CFLAGS) $(CPPFLAGS) -o $@ $< 
 	
 #
 # Link
 #
-$(APP): $(SERVER_PATH)/lib$(SERVER_SHARE).so $(OBJ_CPP) $(OBJ_CC)	
+$(APP): $(SERVER_PATH)/lib$(SERVER_SHARE).so $(OBJ_CPP) $(OBJ_CC)
+	@mkdir -p ../../bin/	
 	@echo linking $@
 	@$(CXX) -o $@ $(OBJ_CPP) $(OBJ_CC) $(LDFLAGS) $(LDLIBS)
 
@@ -67,8 +68,7 @@ $(APP): $(SERVER_PATH)/lib$(SERVER_SHARE).so $(OBJ_CPP) $(OBJ_CC)
 # Clean
 #
 clean:
-	@echo cleaning
-	@rm -f bin/*
+	@echo cleaning	
 	@rm -f $(APP)
 
 -include $(OBJ:.o=.d)

@@ -1,12 +1,14 @@
 
 APP:=basic
 
-SRC_CC := $(wildcard ./*.cc)
-OBJ_CC := $(SRC_CC:%.cc=bin/%.o)
+APP_PATH:=../../bin
+
+SRC_CC := $(wildcard *.cc)
+OBJ_CC := $(SRC_CC:%.cc=../../obj/$(APP)_%.o)
 
 SERVER_HEADERS=../../server/src
 SERVER_SHARE=http_server
-SERVER_PATH=../../server/bin
+SERVER_PATH=../../lib
 
 CFLAGS := -Wall -g3 -std=c++17 -MMD -I$(SERVER_HEADERS)
 
@@ -23,7 +25,7 @@ vpath %.cc ./
 #
 # Bulid app
 #
-all: $(APP)
+all: $(APP_PATH)/$(APP)
 	@$(MAKE) -C ../../server
 	@echo Done making $(APP)
 
@@ -36,15 +38,16 @@ $(SERVER_PATH)/lib$(SERVER_SHARE).so:
 #
 # Compile
 #
-bin/%.o: %.cc
-	@mkdir -p bin/
+../../obj/$(APP)_%.o: %.cc
+	@mkdir -p ../../obj/
 	@echo compiling $<
 	@$(CXX) -c $(CFLAGS) $(CPPFLAGS) -o $@ $< 
 	
 #
 # Link
 #
-$(APP): $(SERVER_PATH)/lib$(SERVER_SHARE).so $(OBJ_CC)		
+$(APP_PATH)/$(APP): $(SERVER_PATH)/lib$(SERVER_SHARE).so $(OBJ_CC)
+	@mkdir -p $(APP_PATH)		
 	@echo linking $@
 	@$(CXX) -o $@ $(OBJ_CPP) $(OBJ_CC) $(LDFLAGS) $(LDLIBS)
 #

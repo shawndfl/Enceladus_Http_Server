@@ -35,4 +35,8 @@
 *.project
 *.cproject
 .settings/
+
+#build dir
 bin/
+obj/
+lib/

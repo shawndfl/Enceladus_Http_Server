@@ -5,9 +5,9 @@
 
 bool Handler(ehs::HttpClientContext& client, const ehs::HttpServerContext& server) {
 
-   LOGI("uri: %s", client.request.getUri().c_str());
-   LOGI("uriPath: %s", client.request.getUriPath().c_str());
-   LOGI("uriQuery: %s", client.request.getUriQuery().c_str());
+   LOGI("uri: " << client.request.getUri().c_str());
+   LOGI("uriPath: " << client.request.getUriPath().c_str());
+   LOGI("uriQuery: " << client.request.getUriQuery().c_str());
 
    std::string body = "<html><head><title>Testing</title></head><body> <b> Hello!!</b><br>";
 
