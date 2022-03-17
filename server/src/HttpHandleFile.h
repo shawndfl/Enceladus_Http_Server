@@ -14,10 +14,13 @@
 namespace ehs {
 class HttpHandleFile {
 public:
-   HttpHandleFile();
+   HttpHandleFile(const std::string& contentPath);
    virtual ~HttpHandleFile();
 
    bool Handler(HttpClientContext& client, const HttpServerContext& server);
+
+private:
+   std::string  contentPath_;
 };
 }
 #endif /* SRC_HTTPHANDLEFILE_H_ */

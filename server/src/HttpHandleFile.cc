@@ -8,12 +8,12 @@
 #include "HttpHandleFile.h"
 #include "Logging.h"
 #include "HttpFileSystem.h"
-#include "Config.h"
 #include <fstream>
 
 namespace ehs {
 /*************************************************/
-HttpHandleFile::HttpHandleFile() {
+HttpHandleFile::HttpHandleFile(const std::string& contentPath) {
+   contentPath_ = contentPath;
 }
 
 /*************************************************/
@@ -23,13 +23,10 @@ HttpHandleFile::~HttpHandleFile() {
 /*************************************************/
 bool HttpHandleFile::Handler(HttpClientContext& client, const HttpServerContext& server) {
    bool handled = false;
-   const Config& config = Config::get();
 
-   std::string path = config.content + client.request.getUriPath();
+   std::string path = contentPath_ + client.request.getUriPath();
    std::string ext = HttpFileSystem::getExtenion(path);
-
-   // TODO check absolute path
-
+   LOGD("Path " << path);
    if(HttpFileSystem::exists(path)) {
       std::ifstream t(path);
 
@@ -57,6 +54,8 @@ bool HttpHandleFile::Handler(HttpClientContext& client, const HttpServerContext&
          client.response.appendHeader("Content-Type", "image/png");
       } else if (ext == ".jpg") {
          client.response.appendHeader("Content-Type", "text/jpg");
+      } else if (ext == ".jpeg") {
+              client.response.appendHeader("Content-Type", "text/jpeg");
       } else {
          client.response.appendHeader("Content-Type", "text/plain");
       }

@@ -1,5 +1,5 @@
 
-APP:=basic
+APP:=02_json_response
 
 APP_PATH:=../../bin
 

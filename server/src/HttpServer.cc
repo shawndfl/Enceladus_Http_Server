@@ -80,7 +80,7 @@ bool HttpServer::StartServer(uint port, uint threadCount) {
 		return false;
 	}
 
-	LOGI("Listening on port " << serverContext_.getPort());
+	LOGI("Starting server " << serverContext_.getPort());
 
 	acceptThread_ = std::thread(&HttpServer::acceptHandler, this);
 
@@ -289,11 +289,27 @@ void HttpServer::requestHandler(const HttpServerContext& context) {
       context->response.appendHeader("Server", "Embedded");
 
       // Let the user handle the request
+      bool handled = false;
       for (auto filter : filters_) {
-         if (filter(*context, serverContext_)) {
+         if ((handled = filter(*context, serverContext_))) {
             break;
          }
       }
+
+      if(!handled) {
+         context->response.statusCode = ehs::HttpResponse::CODE200;
+         context->response.appendHeader("Content-Type", "text/html; charset=ISO-8859-1");
+         std::string body = "<!DOCTYPE html><html><head>"
+               "<meta charset=\"utf-8\"/>"
+               "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+               "<title>Enceladus Http Server</title></head>"
+               "<body><center>Can't find what your are looking for</center><br>"
+               "<center style=\"color:red;\">404</center>"
+               "</body></html>";
+         context->response.body = body;
+         context->sendResponse();
+      }
+
    }
 
 	LOGD("Exiting thread " << std::this_thread::get_id());

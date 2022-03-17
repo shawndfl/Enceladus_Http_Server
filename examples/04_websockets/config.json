@@ -1,0 +1,27 @@
+{
+   #
+   # What port the server is listening on
+   #
+   "listeningPort": 8080,
+   
+   #
+   # security 
+   #
+   "cert": "filename",
+   
+   #
+   # security 
+   #
+   "pass": "password",
+   
+   #
+   # How many thread the server should have for handling a requeset
+   #
+   "threads": 20,
+   
+   #
+   # The path to the content folder
+   #
+   "content": "http/content"
+   
+}

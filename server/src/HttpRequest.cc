@@ -75,8 +75,8 @@ bool HttpRequest::ParseRequestLine(const std::string& line) {
    }
 
    std::locale loc;
-   std::transform(uriPath.begin(), uriPath.end(), uriPath.begin(),
-       [](unsigned char c){ return std::tolower(c); });
+   //std::transform(uriPath.begin(), uriPath.end(), uriPath.begin(),
+   //    [](unsigned char c){ return std::tolower(c); });
 
    const int KEY = 0;
    const int VALUE = 1;
