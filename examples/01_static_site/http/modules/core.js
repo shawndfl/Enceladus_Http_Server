@@ -1,13 +1,41 @@
 
-import * as Async from "/modules/async.js";
+import * as A from "/modules/async.js";
 import * as UI from "/modules/dom.js";
 
-export function start() {
-  var panel = UI.sel("#panel1");
+
+export function start() {    
+      
+  // event handler       
+  UI.getId("sideBarToggle").addEventListener("click", sideBarToggle);
   
-  Async.get("/panel.html", (text)=>{    
-    if(panel.length > 0) { 
-      panel[0].innerHTML = text;
-    }           
-  });     
+  // initialize the correct page
+  hashChange();
+  
+  window.addEventListener("hashchange", hashChange);
+  
 }
+
+function hashChange() {
+  let loc = location.hash;
+  console.debug(loc);
+  let panel = UI.getId("contents");
+  
+  if(loc === "#intro") {
+      A.getPage("introduction.html", panel);
+  } else if(loc === "#setup") {
+      A.getPage("setup.html", panel);
+  }
+  
+  sideBarToggle(); 
+}
+
+function sideBarToggle() {
+  let sideBar = UI.getId("sidebar");  
+     
+  if(sideBar.classList.contains("w3-hide")) {
+    sideBar.classList.remove("w3-hide");                
+  } else {
+    sideBar.classList.add("w3-hide");       
+  }
+}
+

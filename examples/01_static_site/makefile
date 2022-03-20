@@ -1,7 +1,7 @@
 
 APP:=01_static_site
 
-APP_PATH:=../../bin
+APP_PATH:=./
 
 SRC_CC := $(wildcard *.cc)
 OBJ_CC := $(SRC_CC:%.cc=../../obj/$(APP)_%.o)

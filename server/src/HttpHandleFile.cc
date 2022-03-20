@@ -48,6 +48,8 @@ bool HttpHandleFile::Handler(HttpClientContext& client, const HttpServerContext&
          client.response.appendHeader("Content-Type", "text/html");
       } else if (ext == ".json") {
          client.response.appendHeader("Content-Type", "application/json");
+      } else if (ext == ".css") {
+         client.response.appendHeader("Content-Type", "text/css");
       } else if (ext == ".js") {
          client.response.appendHeader("Content-Type", "application/javascript");
       } else if (ext == ".png") {

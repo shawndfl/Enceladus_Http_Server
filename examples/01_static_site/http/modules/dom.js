@@ -9,3 +9,14 @@ export function sel(id) {
   }
   return dom;
 }
+
+/**
+ * gets an id from the document
+ */
+export function getId(documentId) {
+  let value = document.getElementById(documentId);
+  if(value == undefined) {
+    console.error(documentId + " not found");
+  }
+  return value;
+}

@@ -51,8 +51,6 @@ void HttpClientContext::sendRaw(const char *data, size_t size) {
    size_t bytesSent = write(socketfd_, data, size);
    if(bytesSent == (unsigned) -1) {
       LOGD("Error sending: " << strerror(errno));
-   } else {
-      LOGD("sent: " << data << " => " << bytesSent << " bytes");
    }
 }
 
