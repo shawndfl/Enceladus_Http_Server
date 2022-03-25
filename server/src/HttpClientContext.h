@@ -15,7 +15,7 @@ namespace ehs {
 class HttpClientContext {
 
 public:
-   HttpClientContext(int clientfd);
+   HttpClientContext(int clientfd, const std::string& ip);
 
    /**
     * This will be filled in by the server.
@@ -64,8 +64,14 @@ public:
     */
    void close(const std::string& data);
 
+   /**
+    * Gets the remote ip address
+    */
+   const std::string& getRemoteIp() const;
+
 private:
-   int socketfd_;
+   int              socketfd_;
+   std::string      remoteIp_;
 
 };
 }

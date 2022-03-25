@@ -11,7 +11,8 @@ export function start() {
   // initialize the correct page
   hashChange();
   
-  window.addEventListener("hashchange", hashChange);  
+  window.addEventListener("hashchange", hashChange);
+  
 }
 
 function hashChange() {
@@ -19,27 +20,22 @@ function hashChange() {
   console.debug(loc);
   let panel = UI.getId("contents");
   
-  if(loc === "#intro" || loc =="") {
+  if(loc === "#intro") {
       A.getPage("introduction.html", panel);
   } else if(loc === "#setup") {
       A.getPage("setup.html", panel);
-  }   
+  }
+  
+  sideBarToggle(); 
 }
 
 function sideBarToggle() {
-  let sideBar = UI.getId("sidebar"); 
-  let main = UI.getId("main");
-  let titleBar = UI.getId("titleBar");
-  
-  if(sideBar.style.display=="block") {
-      sideBar.style.display="none";   
-      main.style.marginLeft ="0px";   
-      titleBar.style.marginLeft ="0px";
-  } else {    
-      sideBar.style.display="block";
-      main.style.marginLeft ="200px";
-      titleBar.style.marginLeft ="200px";
-          
+  let sideBar = UI.getId("sidebar");  
+     
+  if(sideBar.classList.contains("w3-hide")) {
+    sideBar.classList.remove("w3-hide");                
+  } else {
+    sideBar.classList.add("w3-hide");       
   }
 }
 

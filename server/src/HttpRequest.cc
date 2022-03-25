@@ -7,9 +7,9 @@
 namespace ehs {
 
 /*************************************************/
-HttpRequest::HttpRequest() :
+HttpRequest::HttpRequest(const std::string& remoteIp) :
       parseErrorCode(0), parsedState(HttpRequest::NewRequest) {
-
+   remoteIp_ = remoteIp;
 }
 
 /*************************************************/
@@ -216,7 +216,7 @@ void HttpRequest::parseLines(std::vector<std::string>& lines) {
       } else {
          ParseHeaderLine(line);
       }
-      LOGD(line.substr(0, line.size()-2));
+      LOGD(remoteIp_ << " >> " << line.substr(0, line.size()-2));
    }
 }
 
@@ -274,4 +274,9 @@ int HttpRequest::getParseErrorCode() const {
 const std::string& HttpRequest::getUri() const {
    return uri;
 }
+
+const std::string& HttpRequest::getRemoteIp() const {
+   return remoteIp_;
+}
+
 }

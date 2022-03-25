@@ -21,7 +21,7 @@ public:
       NewRequest, IncompleteStartLine, IncompleteHeader, IncompleteMessage, Complete, ParseError
    };
 
-   HttpRequest();
+   HttpRequest(const std::string& remoteIp);
 
    /**
     * gets the size of the body based on the
@@ -48,6 +48,7 @@ public:
    const std::string& getUriQuery() const;
 
    std::string getHeader(const std::string& header) const;
+   const std::string& getRemoteIp() const;
 
 private:
    /**
@@ -166,6 +167,8 @@ private:
     * Body
     */
    std::string body;
+
+   std::string remoteIp_;
 
 };
 }

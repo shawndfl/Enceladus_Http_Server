@@ -1,4 +1,3 @@
-#ifndef UNIT_TEST
 
 #include <iostream>
 #include "Enceladus.h"
@@ -6,6 +5,10 @@
 bool Handler(ehs::HttpClientContext& client, const ehs::HttpServerContext& server) {
 
    ehs::JsonNode node;
+
+   //TODO show how to access query arguments
+
+   //TODO show how to get resource paths
 
    node["user"][0]["name"] = "Bob";
    node["user"][0]["phone"] = "555-555-5555";
@@ -31,6 +34,9 @@ int main(int argc, char *argv[]) {
    ehs::HttpServer server;
    server.StartServer(config.listeningPort, config.threads);
 
+   // setup default file handler
+   ehs::HttpHandleFile httpFiles(config.content);
+
    // setup default handlers
    server.addRequestHandler(&Handler);
 
@@ -39,4 +45,3 @@ int main(int argc, char *argv[]) {
    return 0;
 }
 
-#endif

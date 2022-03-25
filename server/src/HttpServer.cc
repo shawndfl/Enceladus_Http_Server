@@ -8,6 +8,10 @@
 #include <signal.h>
 #include <errno.h>
 
+#include <sys/ioctl.h>
+#include <net/if.h>
+#include <arpa/inet.h>
+
 #include "Logging.h"
 
 #include "HttpServer.h"
@@ -80,7 +84,37 @@ bool HttpServer::StartServer(uint port, uint threadCount) {
 		return false;
 	}
 
-	LOGI("Starting server " << serverContext_.getPort());
+	LOGI("Starting server...");
+
+	// Query available interfaces
+	struct ifconf ifc;
+    struct ifreq *ifr;
+    int           nInterfaces;
+	char          buf[1024];
+    ifc.ifc_len = sizeof(buf);
+    ifc.ifc_buf = buf;
+    if (ioctl(serverContext_.getSocketfd(), SIOCGIFCONF, &ifc) < 0) {
+       LOGE("ioctl(SIOCGIFCONF): " << errno);
+       return false;
+    }
+
+    //Iterate through the list of interfaces.
+    ifr = ifc.ifc_req;
+    nInterfaces = ifc.ifc_len / sizeof(struct ifreq);
+    for (int i = 0; i < nInterfaces; i++) {
+       struct ifreq *item = &ifr[i];
+
+       // Show the server's name and IP address
+       LOGI("  "
+             << inet_ntoa(((struct sockaddr_in*) &item->ifr_addr)->sin_addr)
+             << ":" <<  serverContext_.getPort()
+             << " (" << item->ifr_name << ")");
+
+       //Get the broadcast address
+       //if (ioctl(serverContext_.getSocketfd(), SIOCGIFBRDADDR, item) >= 0) {
+       //   LOGD("   broadcast " << inet_ntoa(((struct sockaddr_in*) &item->ifr_broadaddr)->sin_addr));
+       //}
+    }
 
 	acceptThread_ = std::thread(&HttpServer::acceptHandler, this);
 
@@ -126,12 +160,15 @@ void HttpServer::acceptHandler() {
          break;
       }
 
-      //TODO add ip address of client
-      LOGI("Got a client " << clientfd);
+      // get the remote ip address
+      std::string ip = inet_ntoa(((struct sockaddr_in*) &clientAddr)->sin_addr);
+
+      //LOG the client ip address
+      LOGI("Got a client " << ip << " (" << clientfd << ")");
 
       // create the client context
       std::shared_ptr<HttpClientContext> context
-         = std::make_shared<HttpClientContext>(clientfd);
+         = std::make_shared<HttpClientContext>(clientfd, ip);
 
       std::unique_lock<std::mutex> lock(requestMutex_);
 
@@ -296,6 +333,7 @@ void HttpServer::requestHandler(const HttpServerContext& context) {
          }
       }
 
+      // a default 404 error
       if(!handled) {
          context->response.statusCode = ehs::HttpResponse::CODE200;
          context->response.appendHeader("Content-Type", "text/html; charset=ISO-8859-1");

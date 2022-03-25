@@ -5,9 +5,9 @@
 #include <string.h>
 
 namespace ehs {
-HttpClientContext::HttpClientContext(int clientfd) :
-      socketfd_(clientfd) {
-
+HttpClientContext::HttpClientContext(int clientfd, const std::string& ip) :
+      request(ip), socketfd_(clientfd) {
+   remoteIp_ = ip;
 }
 
 /*************************************************/
@@ -140,6 +140,16 @@ bool HttpClientContext::readRaw(std::string &data) {
    } while (bytesSent != (size_t)-1);
 
    return true;
+}
+
+/*************************************************/
+void HttpClientContext::readWebSocketFrame(const std::string &data) {
+   //TODO implement web sockets
+}
+
+/*************************************************/
+const std::string& HttpClientContext::getRemoteIp() const {
+   return remoteIp_;
 }
 
 /*************************************************/
