@@ -1,5 +1,8 @@
 
-APP:=../lib/libhttp_server.so
+APP:=../lib/libenceladus.so
+MAJOR := 0
+MINOR := 1
+PATCH := 0
 
 SRC_CC := $(wildcard ./src/*.cc)
 SRC := $(notdir $(SRC_CC:%.cc=%))
@@ -22,6 +25,14 @@ all: $(APP)
 #
 debug: CFLAGS += -g3
 debug: all
+
+install: $(APP)	  
+	cp -f $(APP) /usr/local/lib/$(APP).$(MAJOR).$(MINOR).$(PATCH)	
+	cd /usr/local/lib/ && ln -s -f  $(APP).$(MAJOR).$(MINOR).$(PATCH) $(APP).$(MAJOR)
+	cd /usr/local/lib/ && ln -s -f $(APP).$(MAJOR).$(MINOR).$(PATCH) $(APP)
+	@mkdir -p /usr/local/include/enceladus
+	@rm /usr/local/include/enceladus/*
+	cp -f ./src/*.h  /usr/local/include/enceladus/ 
 
 #
 # Compile
