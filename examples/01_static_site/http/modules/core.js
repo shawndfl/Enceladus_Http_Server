@@ -19,9 +19,9 @@ function hashChange() {
   console.debug(loc);
   let panel = UI.getId("contents");
   
-  if(loc === "#intro" || loc =="") {
-      A.getPage("introduction.html", panel);
-  } else if(loc === "#setup") {
+  if(loc === "#setup" || loc =="") {
+      A.getPage("setup.html", panel);
+  } else if(loc === "#api") {
       A.getPage("setup.html", panel);
   }   
 }

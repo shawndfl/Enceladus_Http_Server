@@ -15,6 +15,7 @@
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 #include "HttpConst.h"
+#include "IRequestHandler.h"
 
 namespace ehs {
 
@@ -53,6 +54,11 @@ public:
     *       will be required when accessing shared resources.
     */
    void addRequestHandler(HttpRequestHandler handler);
+
+   /**
+    * Adds a handler using an interface
+    */
+   void addRequestHandler(const IRequestHandler& handler);
 
    /**
     * Gets the user data for the request handler.

@@ -10,14 +10,21 @@
 
 #include "HttpClientContext.h"
 #include "HttpServerContext.h"
+#include "IRequestHandler.h"
 
 namespace ehs {
-class HttpHandleFile {
+/**
+ * Handles any http request for a file
+ */
+class HttpHandleFile: public IRequestHandler {
 public:
    HttpHandleFile(const std::string& contentPath);
    virtual ~HttpHandleFile();
 
-   bool Handler(HttpClientContext& client, const HttpServerContext& server);
+   /**
+    * Handles the request for a file.
+    */
+   virtual bool Handler(HttpClientContext& client, const HttpServerContext& server);
 
 private:
    std::string  contentPath_;

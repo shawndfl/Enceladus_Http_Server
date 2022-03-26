@@ -8,10 +8,9 @@ export function start() {
   // event handler       
   UI.getId("sideBarToggle").addEventListener("click", sideBarToggle);
   
-  // initialize the correct page
-  hashChange();
-  
-  window.addEventListener("hashchange", hashChange);
+  A.get("/user/list", ()=>{
+    
+  });
   
 }
 

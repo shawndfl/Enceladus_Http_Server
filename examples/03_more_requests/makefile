@@ -1,7 +1,7 @@
 
 APP:=03_more_requests
 
-APP_PATH:=../../bin
+APP_PATH:=./
 
 SRC_CC := $(wildcard *.cc)
 OBJ_CC := $(SRC_CC:%.cc=../../obj/$(APP)_%.o)

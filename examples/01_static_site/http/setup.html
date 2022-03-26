@@ -1,15 +1,31 @@
 <div>
-  <article>
-    <h1>Setup</h1>
-    Enceladus has minimual depencencies. It currently only uses c++ 17 and the
-    standard template library. Make is used to build the share library and the
-    examples. You will want to start by installing <b>gcc</b> and <b>Make</b>
-
-    <pre class="w3-card w3-black w3-margin">
-      <code>
-      # sudo apt install g++ make
-      </code>
-      <i class ="fa fa-copy"></i>
-    </pre>
+  <h1 class="w3-xxlarge">Introduction</h1>
+  <article class="w3-container">
+    <p>Enceladus is a http server written in C++. It is compiled as a shared
+      library and can be included in other projects. The goal of this project is
+      to provide a light weight embedded web server that can be easliy included
+      into a linux application.</p>
   </article>
+
+  <h1 class="w3-xxlarge">Setup</h1>
+  <p>
+    There are minimal dependencies. Currently, this is built for linux only. It
+    should not be hard to port to windows. All that's required is <span
+      class="code w3-round">g++</span> and <span class="code w3-round">make</span>
+  </p>
+
+  <code class="code-script w3-card w3-round-large">
+    <span class="code-key">$</span> <span class="code-normal"> sudo apt
+      install g++ make </span>
+  </code>
+
+  <p>Then clone the repo using this command.</p>
+
+  <code class="code-script w3-card w3-round-large">
+    <span class="code-key">$</span> <span class="code-normal"> git clone
+      https://github.com/shawndfl/Enceladus_Http_Server.git</span>
+  </code>
+
+
+
 </div>

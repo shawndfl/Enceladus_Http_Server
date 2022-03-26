@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
    ehs::HttpHandleFile httpFiles(config.content);
 
    // setup default handlers
+   server.addRequestHandler(httpFiles);
    server.addRequestHandler(&Handler);
 
    server.JoinAcceptThread();

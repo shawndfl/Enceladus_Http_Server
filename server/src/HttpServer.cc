@@ -144,7 +144,15 @@ void HttpServer::JoinAcceptThread() {
 
 /*************************************************/
 void HttpServer::addRequestHandler(HttpRequestHandler handler) {
+   LOGD("Adding handler ");
 	filters_.push_back(handler);
+}
+
+/*************************************************/
+void HttpServer::addRequestHandler(const IRequestHandler& handler) {
+   using namespace std::placeholders;
+   LOGD("Adding handler ");
+   filters_.push_back(std::bind(&ehs::IRequestHandler::handler, handler, _1, _2));
 }
 
 /*************************************************/

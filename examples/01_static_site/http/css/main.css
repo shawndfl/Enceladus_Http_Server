@@ -11,6 +11,14 @@
   white-space: nowrap;
 }
 
+.code {
+   font-family: monospace;
+   padding: 3px;
+   display: inline;
+   color: #64a0ff;
+   background-color: #000000;
+}
+
 .code-key {
    display: inline;
    color: #64a0ff;
